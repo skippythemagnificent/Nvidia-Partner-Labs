@@ -1,0 +1,61 @@
+[project]
+name = "nvidia-partner-labs"
+version = "0.1.0"
+description = "NVIDIA Partner Lab Series — MLOps, RAG, NIM, GPU architecture, agents, observability"
+requires-python = ">=3.12"
+dependencies = [
+    "openai>=1.30",
+    "chromadb>=0.5",
+    "sentence-transformers>=3.0",
+    "jupyter>=1.0",
+    "nbformat>=5.9",
+    "pytest>=8.0",
+    "nbmake>=1.5",
+    "python-dotenv>=1.0",
+    "httpx>=0.27",
+    "rich>=13.0",
+    "tqdm>=4.66",
+    "pydantic>=2.7",
+    "fastapi>=0.111",
+    "uvicorn>=0.30",
+    "langchain-core>=0.2",
+    "langgraph>=0.1",
+    "ragas>=0.1",
+    "opentelemetry-api>=1.24",
+    "opentelemetry-sdk>=1.24",
+    "prometheus-client>=0.20",
+    "ipykernel>=7.3.0",
+]
+
+[project.optional-dependencies]
+gpu = [
+    "torch>=2.3",
+    "accelerate>=0.30",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.4",
+    "mypy>=1.10",
+    "ipykernel>=6.29",
+    "python-pptx>=1.0.2",
+]
+
+[tool.pytest.ini_options]
+# importlib import mode so each lab's identically-named tests/test_lab.py can be
+# collected together (e.g. `task lab:test:all`) without module-name collisions.
+addopts = "--import-mode=importlib"
+
+[tool.ruff]
+# Notebooks are authored teaching artifacts: stub cells intentionally leave
+# unused starter variables for the learner to consume, and the repo-root
+# bootstrap necessarily runs before the `shared` imports. Lint the .py sources,
+# not the .ipynb files.
+extend-exclude = ["*.ipynb"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["shared"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

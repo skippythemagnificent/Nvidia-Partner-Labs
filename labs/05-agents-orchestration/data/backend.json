@@ -1,0 +1,332 @@
+{
+  "accounts": {
+    "acct-1001": {
+      "account_id": "acct-1001",
+      "tier": "free",
+      "status": "active",
+      "seats": 1
+    },
+    "acct-1002": {
+      "account_id": "acct-1002",
+      "tier": "pro",
+      "status": "active",
+      "seats": 2
+    },
+    "acct-1003": {
+      "account_id": "acct-1003",
+      "tier": "enterprise",
+      "status": "active",
+      "seats": 3
+    },
+    "acct-1004": {
+      "account_id": "acct-1004",
+      "tier": "free",
+      "status": "active",
+      "seats": 4
+    },
+    "acct-1005": {
+      "account_id": "acct-1005",
+      "tier": "pro",
+      "status": "active",
+      "seats": 5
+    },
+    "acct-1006": {
+      "account_id": "acct-1006",
+      "tier": "enterprise",
+      "status": "active",
+      "seats": 1
+    },
+    "acct-1007": {
+      "account_id": "acct-1007",
+      "tier": "free",
+      "status": "active",
+      "seats": 2
+    },
+    "acct-1008": {
+      "account_id": "acct-1008",
+      "tier": "pro",
+      "status": "active",
+      "seats": 3
+    },
+    "acct-1009": {
+      "account_id": "acct-1009",
+      "tier": "enterprise",
+      "status": "active",
+      "seats": 4
+    },
+    "acct-1010": {
+      "account_id": "acct-1010",
+      "tier": "free",
+      "status": "active",
+      "seats": 5
+    },
+    "acct-1011": {
+      "account_id": "acct-1011",
+      "tier": "pro",
+      "status": "active",
+      "seats": 1
+    },
+    "acct-1012": {
+      "account_id": "acct-1012",
+      "tier": "enterprise",
+      "status": "active",
+      "seats": 2
+    }
+  },
+  "invoices": {
+    "acct-1001": [
+      {
+        "id": "inv-1001-01",
+        "amount_usd": 49,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1001-02",
+        "amount_usd": 49,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1001-03",
+        "amount_usd": 49,
+        "status": "open"
+      }
+    ],
+    "acct-1002": [
+      {
+        "id": "inv-1002-01",
+        "amount_usd": 98,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1002-02",
+        "amount_usd": 98,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1002-03",
+        "amount_usd": 98,
+        "status": "open"
+      }
+    ],
+    "acct-1003": [
+      {
+        "id": "inv-1003-01",
+        "amount_usd": 147,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1003-02",
+        "amount_usd": 147,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1003-03",
+        "amount_usd": 147,
+        "status": "open"
+      }
+    ],
+    "acct-1004": [
+      {
+        "id": "inv-1004-01",
+        "amount_usd": 196,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1004-02",
+        "amount_usd": 196,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1004-03",
+        "amount_usd": 196,
+        "status": "open"
+      }
+    ],
+    "acct-1005": [
+      {
+        "id": "inv-1005-01",
+        "amount_usd": 49,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1005-02",
+        "amount_usd": 49,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1005-03",
+        "amount_usd": 49,
+        "status": "open"
+      }
+    ],
+    "acct-1006": [
+      {
+        "id": "inv-1006-01",
+        "amount_usd": 98,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1006-02",
+        "amount_usd": 98,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1006-03",
+        "amount_usd": 98,
+        "status": "open"
+      }
+    ],
+    "acct-1007": [
+      {
+        "id": "inv-1007-01",
+        "amount_usd": 147,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1007-02",
+        "amount_usd": 147,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1007-03",
+        "amount_usd": 147,
+        "status": "open"
+      }
+    ],
+    "acct-1008": [
+      {
+        "id": "inv-1008-01",
+        "amount_usd": 196,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1008-02",
+        "amount_usd": 196,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1008-03",
+        "amount_usd": 196,
+        "status": "open"
+      }
+    ],
+    "acct-1009": [
+      {
+        "id": "inv-1009-01",
+        "amount_usd": 49,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1009-02",
+        "amount_usd": 49,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1009-03",
+        "amount_usd": 49,
+        "status": "open"
+      }
+    ],
+    "acct-1010": [
+      {
+        "id": "inv-1010-01",
+        "amount_usd": 98,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1010-02",
+        "amount_usd": 98,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1010-03",
+        "amount_usd": 98,
+        "status": "open"
+      }
+    ],
+    "acct-1011": [
+      {
+        "id": "inv-1011-01",
+        "amount_usd": 147,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1011-02",
+        "amount_usd": 147,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1011-03",
+        "amount_usd": 147,
+        "status": "open"
+      }
+    ],
+    "acct-1012": [
+      {
+        "id": "inv-1012-01",
+        "amount_usd": 196,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1012-02",
+        "amount_usd": 196,
+        "status": "paid"
+      },
+      {
+        "id": "inv-1012-03",
+        "amount_usd": 196,
+        "status": "open"
+      }
+    ]
+  },
+  "usage": {
+    "acct-1001": {
+      "api_calls_30d": 1000,
+      "errors_30d": 0
+    },
+    "acct-1002": {
+      "api_calls_30d": 2000,
+      "errors_30d": 5
+    },
+    "acct-1003": {
+      "api_calls_30d": 3000,
+      "errors_30d": 10
+    },
+    "acct-1004": {
+      "api_calls_30d": 4000,
+      "errors_30d": 15
+    },
+    "acct-1005": {
+      "api_calls_30d": 5000,
+      "errors_30d": 20
+    },
+    "acct-1006": {
+      "api_calls_30d": 6000,
+      "errors_30d": 25
+    },
+    "acct-1007": {
+      "api_calls_30d": 7000,
+      "errors_30d": 30
+    },
+    "acct-1008": {
+      "api_calls_30d": 8000,
+      "errors_30d": 0
+    },
+    "acct-1009": {
+      "api_calls_30d": 9000,
+      "errors_30d": 5
+    },
+    "acct-1010": {
+      "api_calls_30d": 10000,
+      "errors_30d": 10
+    },
+    "acct-1011": {
+      "api_calls_30d": 11000,
+      "errors_30d": 15
+    },
+    "acct-1012": {
+      "api_calls_30d": 12000,
+      "errors_30d": 20
+    }
+  }
+}

@@ -1,0 +1,302 @@
+[
+  {
+    "id": "d01",
+    "title": "What NVIDIA NIM packages for you",
+    "text": "NVIDIA NIM is a set of containerized inference microservices that wrap an optimized model engine behind a stable, OpenAI-compatible HTTP API. Each container ships the model weights, a tuned TensorRT-LLM or Triton backend, and the runtime needed to serve it, so a team can pull one image from NGC and get a production endpoint without assembling the stack by hand.",
+    "source_url": "https://developer.nvidia.com/blog/d01"
+  },
+  {
+    "id": "d02",
+    "title": "NIM exposes an OpenAI-compatible API",
+    "text": "Because every NIM speaks the OpenAI REST dialect, existing clients work unchanged: point the OpenAI SDK at the NIM base URL and call /v1/chat/completions, /v1/completions, or /v1/embeddings. This means you can swap a hosted model for a self-hosted NIM by changing only the base_url and api_key, with no rewrite of application code.",
+    "source_url": "https://developer.nvidia.com/blog/d02"
+  },
+  {
+    "id": "d03",
+    "title": "Pulling NIM images from NGC",
+    "text": "NIM container images live in the NVIDIA NGC private registry at nvcr.io. To pull them you authenticate Docker with your NGC API key, using the literal username $oauthtoken and the key as the password. In Kubernetes the same credential is stored as an image pull secret of type kubernetes.io/dockerconfigjson so the kubelet can fetch the image.",
+    "source_url": "https://developer.nvidia.com/blog/d03"
+  },
+  {
+    "id": "d04",
+    "title": "Deploying a NIM with the official Helm chart",
+    "text": "NVIDIA publishes a Helm chart for NIM at the NGC Helm repository. The chart templates a Deployment, a Service, and a PersistentVolumeClaim for the model cache, and it wires in the NGC pull secret. You set the model image, the GPU count under resources.limits, and persistence.size for the cache volume, then run helm install against your cluster.",
+    "source_url": "https://developer.nvidia.com/blog/d04"
+  },
+  {
+    "id": "d05",
+    "title": "TensorRT-LLM profile selection at startup",
+    "text": "On startup a NIM inspects the GPUs it has been scheduled onto and selects a matching TensorRT-LLM engine profile \u2014 for example an H100 FP8 profile versus an A100 FP16 profile. The selected profile is printed in the container logs. If no prebuilt profile matches the detected hardware, the NIM falls back to building an engine locally, which adds minutes to the first startup.",
+    "source_url": "https://developer.nvidia.com/blog/d05"
+  },
+  {
+    "id": "d06",
+    "title": "Reading the profile NIM selected",
+    "text": "To confirm which optimization profile a running NIM chose, query its model metadata endpoint or grep the startup logs for the profile hash. Mismatched profiles are a common cause of lower-than-expected throughput: a NIM that silently fell back to a generic profile will serve correct answers but at a fraction of the tokens-per-second the hardware can sustain.",
+    "source_url": "https://developer.nvidia.com/blog/d06"
+  },
+  {
+    "id": "d07",
+    "title": "Prefix KV-cache reuse in NIM",
+    "text": "NIM can reuse the attention key/value cache for prompt prefixes that recur across requests, such as a shared system prompt, so those tokens are not recomputed every call. The feature is controlled by the environment variable NIM_ENABLE_KV_CACHE_REUSE. It is off by default because caching trades GPU memory for latency, and that trade-off should be measured per workload. To turn it on in production you set NIM_ENABLE_KV_CACHE_REUSE to 1.",
+    "source_url": "https://developer.nvidia.com/blog/d07"
+  },
+  {
+    "id": "d08",
+    "title": "KV cache exhaustion under load",
+    "text": "The KV cache is the dominant consumer of GPU memory during decode. When too many concurrent sequences are in flight the cache fills, and the scheduler either queues or preempts requests, which shows up as a sudden latency cliff rather than a gradual slowdown. Reducing max sequence length or lowering concurrency relieves the pressure.",
+    "source_url": "https://developer.nvidia.com/blog/d08"
+  },
+  {
+    "id": "d09",
+    "title": "Continuous batching keeps GPUs busy",
+    "text": "Rather than waiting for a fixed batch to fill, TensorRT-LLM uses continuous (in-flight) batching: it admits new requests into the running batch as soon as slots free up when other sequences finish. This keeps the GPU saturated under bursty traffic and is the main reason a single NIM can serve many concurrent users without a linear collapse in throughput.",
+    "source_url": "https://developer.nvidia.com/blog/d09"
+  },
+  {
+    "id": "d10",
+    "title": "Prefill versus decode",
+    "text": "An LLM request has two phases with very different hardware profiles. Prefill processes the whole prompt in parallel and is compute-bound, so it scales with GPU FLOPs. Decode generates one token at a time and is memory-bandwidth-bound, so it scales with HBM bandwidth. Time-to-first-token is dominated by prefill; inter-token latency is dominated by decode.",
+    "source_url": "https://developer.nvidia.com/blog/d10"
+  },
+  {
+    "id": "d11",
+    "title": "NV-EmbedQA is an asymmetric embedding model",
+    "text": "NV-EmbedQA-E5-v5 is trained for asymmetric retrieval: a question and the passage that answers it are encoded differently. Callers must declare the role of each input with input_type, set to query for the user's question and to passage for indexed documents. Omitting input_type collapses the two roles and produces vectors that do not compare meaningfully.",
+    "source_url": "https://developer.nvidia.com/blog/d11"
+  },
+  {
+    "id": "d12",
+    "title": "Why input_type matters for retrieval quality",
+    "text": "Encoding a query with the passage role (or vice versa) places it in the wrong subspace, so cosine similarity against your index becomes noise and recall drops sharply. The failure is silent: the API still returns a vector of the right shape, and the bug only surfaces as bad search results. Always pass input_type explicitly on every embedding call.",
+    "source_url": "https://developer.nvidia.com/blog/d12"
+  },
+  {
+    "id": "d13",
+    "title": "Embedding dimensionality and storage",
+    "text": "NV-EmbedQA-E5-v5 returns 1024-dimensional vectors. The dimensionality fixes the width of every row in your vector index, so it must match between indexing and query time. Switching embedding models almost always changes the dimension and therefore requires a full re-index of the corpus.",
+    "source_url": "https://developer.nvidia.com/blog/d13"
+  },
+  {
+    "id": "d14",
+    "title": "Cosine similarity for normalized embeddings",
+    "text": "Retrieval ranks passages by cosine similarity between the query vector and each passage vector. When embeddings are L2-normalized, cosine similarity reduces to the dot product, and cosine distance equals one minus that similarity. Configure your vector store to use the cosine space explicitly; a store left on its Euclidean default will rank differently.",
+    "source_url": "https://developer.nvidia.com/blog/d14"
+  },
+  {
+    "id": "d15",
+    "title": "Chunking is a retrieval decision, not a formatting one",
+    "text": "How you split documents determines what the retriever can possibly return. A chunk is the smallest unit that can be retrieved, so if the text that answers a question is spread across two chunks, no single result will contain the whole answer. Chunk size and boundaries should be chosen for retrieval, then the context window checked second.",
+    "source_url": "https://developer.nvidia.com/blog/d15"
+  },
+  {
+    "id": "d16",
+    "title": "Fixed-size chunking and its failure mode",
+    "text": "Fixed-size chunking splits text every N characters or tokens regardless of meaning. It is simple and predictable, but it routinely cuts a sentence \u2014 or the definition of a setting and its required value \u2014 across a boundary. When that happens the answer is fragmented and retrieval returns an adjacent chunk that looks relevant but is incomplete.",
+    "source_url": "https://developer.nvidia.com/blog/d16"
+  },
+  {
+    "id": "d17",
+    "title": "Sentence-aware and semantic chunking",
+    "text": "Sentence-aware chunking respects sentence boundaries and groups consecutive sentences up to a size budget, so a complete thought stays intact. Semantic chunking goes further and splits where the topic shifts. Both keep answer-bearing text together, which raises the chance that a single retrieved chunk fully answers the question.",
+    "source_url": "https://developer.nvidia.com/blog/d17"
+  },
+  {
+    "id": "d18",
+    "title": "Chunk overlap preserves context at the seams",
+    "text": "Adding a small overlap between adjacent chunks \u2014 repeating the last sentence or two at the start of the next chunk \u2014 softens boundary effects so a fact that lands near a seam appears in both neighbors. Overlap costs index size and some duplication in results, so keep it modest, on the order of 10 to 20 percent.",
+    "source_url": "https://developer.nvidia.com/blog/d18"
+  },
+  {
+    "id": "d19",
+    "title": "Top-k retrieval and the context budget",
+    "text": "Retrieval returns the top-k most similar chunks, which are concatenated into the prompt as context. Larger k raises recall but spends context tokens and can bury the answer among distractors. A common pattern is to over-retrieve, then rerank down to a smaller, higher-precision set before assembling the prompt.",
+    "source_url": "https://developer.nvidia.com/blog/d19"
+  },
+  {
+    "id": "d20",
+    "title": "Assembling grounded context for the LLM",
+    "text": "After retrieval, the chunks are formatted into the prompt with a clear instruction to answer only from the provided context and to say when the answer is not present. Grounding the model this way reduces hallucination, and including the source of each chunk lets the application cite where an answer came from.",
+    "source_url": "https://developer.nvidia.com/blog/d20"
+  },
+  {
+    "id": "d21",
+    "title": "Why the first NIM request is slow (cold start)",
+    "text": "The first request to a freshly started NIM is far slower than later ones even when the GPU is idle. On cold start the NIM must load model weights into GPU memory and finalize the TensorRT-LLM engine before it can serve a single token, so the latency you see on request one is dominated by model load, not by inference. Once warm, the same request returns in a fraction of the time.",
+    "source_url": "https://developer.nvidia.com/blog/d21"
+  },
+  {
+    "id": "d22",
+    "title": "The command that starts a NIM container",
+    "text": "To start a NIM locally you run the container with docker run, pass your NGC key in the environment, request the GPU with the --gpus all flag, and publish the service port. The container then begins its startup sequence and reports ready once the model is loaded. This is the quickest way to bring a single NIM up on a workstation for testing.",
+    "source_url": "https://developer.nvidia.com/blog/d22"
+  },
+  {
+    "id": "d23",
+    "title": "Health and readiness endpoints",
+    "text": "Every NIM exposes Kubernetes-style probes. /v2/health/live indicates the process is up, while /v2/health/ready returns 200 only after the model is loaded and the service can answer requests. Wire readiness \u2014 not liveness \u2014 into your load balancer so traffic is held back until the cold start completes.",
+    "source_url": "https://developer.nvidia.com/blog/d23"
+  },
+  {
+    "id": "d24",
+    "title": "Autoscaling NIM replicas",
+    "text": "Because GPUs are the scarce resource, NIM replicas are scaled on GPU-aware signals rather than CPU. Teams commonly drive a Horizontal Pod Autoscaler from queue depth or a custom metric like KV-cache utilization exported by the NIM, and they account for cold-start time so new replicas are ready before the spike they were meant to absorb.",
+    "source_url": "https://developer.nvidia.com/blog/d24"
+  },
+  {
+    "id": "d25",
+    "title": "Air-gapped NIM deployment",
+    "text": "For environments with no internet egress, NIM supports an offline cache: on a connected host you pre-download the model profile into a cache directory, transfer that directory across the air gap, and mount it into the container so the NIM finds the model locally and never reaches out to NGC at runtime.",
+    "source_url": "https://developer.nvidia.com/blog/d25"
+  },
+  {
+    "id": "d26",
+    "title": "Multi-Instance GPU partitions an H100",
+    "text": "Multi-Instance GPU (MIG) splits one A100 or H100 into as many as seven isolated instances, each with its own slice of compute and a dedicated, hardware-walled portion of HBM. MIG suits many small models or strict tenant isolation; it does not help a single large model that needs the whole device's memory and compute.",
+    "source_url": "https://developer.nvidia.com/blog/d26"
+  },
+  {
+    "id": "d27",
+    "title": "Tensor parallelism for large models",
+    "text": "When a model's weights and KV cache exceed one GPU's memory, tensor parallelism shards each layer across several GPUs that exchange activations over NVLink every step. It enables models that would not otherwise fit, but the per-step communication means throughput does not scale linearly with the GPU count.",
+    "source_url": "https://developer.nvidia.com/blog/d27"
+  },
+  {
+    "id": "d28",
+    "title": "NVLink versus PCIe for multi-GPU inference",
+    "text": "NVLink provides far higher GPU-to-GPU bandwidth than PCIe, which matters for the frequent all-reduce traffic of tensor-parallel inference. An SXM board with NVLink will sustain tensor-parallel decode that a PCIe board, limited to the slower bus, throttles. Match the interconnect to whether you intend to run multi-GPU models.",
+    "source_url": "https://developer.nvidia.com/blog/d28"
+  },
+  {
+    "id": "d29",
+    "title": "HBM bandwidth bounds decode throughput",
+    "text": "During decode the GPU streams the full model weights and KV cache from HBM for every token, so inter-token latency is set by memory bandwidth, not raw FLOPs. This is why the HBM3 bandwidth of an H100 SXM, rather than its compute, is often the figure that predicts tokens-per-second for a given model.",
+    "source_url": "https://developer.nvidia.com/blog/d29"
+  },
+  {
+    "id": "d30",
+    "title": "FP8 on Hopper",
+    "text": "Hopper GPUs add hardware FP8, and TensorRT-LLM can quantize weights and activations to FP8 to roughly halve memory traffic versus FP16. That widens the decode bottleneck and increases throughput, usually with negligible quality loss when the quantization is calibrated. FP8 profiles are why H100 NIMs often far outpace their A100 counterparts.",
+    "source_url": "https://developer.nvidia.com/blog/d30"
+  },
+  {
+    "id": "d31",
+    "title": "Speculative decoding",
+    "text": "Speculative decoding runs a small draft model to propose several tokens that the large target model then verifies in a single forward pass. When the draft is usually right, this amortizes the memory-bound decode step over multiple tokens and cuts latency, at the cost of running and maintaining a second model.",
+    "source_url": "https://developer.nvidia.com/blog/d31"
+  },
+  {
+    "id": "d32",
+    "title": "Triton serves the model under NIM",
+    "text": "Inside many NIMs the Triton Inference Server hosts the optimized engine and handles request scheduling, dynamic batching, and metrics. NIM presents the friendly OpenAI API on top, but the Triton layer underneath is what exposes the operational knobs and the Prometheus metrics endpoint that platform teams scrape.",
+    "source_url": "https://developer.nvidia.com/blog/d32"
+  },
+  {
+    "id": "d33",
+    "title": "Triton metrics for observability",
+    "text": "Triton publishes Prometheus metrics on port 8002 at /metrics, including request counts, queue time, compute time, and time-to-first-token. Scraping these gives platform teams the latency breakdown they need to tell a queuing problem (rising queue time) apart from a compute problem (rising compute time).",
+    "source_url": "https://developer.nvidia.com/blog/d33"
+  },
+  {
+    "id": "d34",
+    "title": "DCGM Exporter for GPU-level metrics",
+    "text": "The DCGM Exporter surfaces device-level telemetry \u2014 GPU utilization, memory used, temperature, power, and SM clocks \u2014 as Prometheus metrics. Paired with Triton's serving metrics it lets you correlate a latency spike with, say, a thermal throttle or a memory-pressure event on the specific GPU serving the request.",
+    "source_url": "https://developer.nvidia.com/blog/d34"
+  },
+  {
+    "id": "d35",
+    "title": "NeMo Retriever embedding and reranking NIMs",
+    "text": "NeMo Retriever packages the retrieval models as NIMs: an embedding NIM such as NV-EmbedQA for the first-stage vector search and a reranking NIM such as NV-RerankQA-Mistral-4B for the second stage. Running both as NIMs gives a RAG pipeline the same OpenAI-style interface and on-prem deployment story as the generation model.",
+    "source_url": "https://developer.nvidia.com/blog/d35"
+  },
+  {
+    "id": "d36",
+    "title": "Bi-encoders retrieve, cross-encoders rerank",
+    "text": "An embedding model is a bi-encoder: it encodes the query and each passage separately, which is fast and lets you precompute the index, but it never lets the two texts interact. A cross-encoder reranker reads the query and a passage together and scores their relevance directly, which is far more accurate but too expensive to run over the whole corpus.",
+    "source_url": "https://developer.nvidia.com/blog/d36"
+  },
+  {
+    "id": "d37",
+    "title": "The two-stage retrieve-then-rerank pattern",
+    "text": "Production RAG over-retrieves cheaply with the bi-encoder \u2014 say the top 20 by cosine \u2014 then reranks those candidates with the cross-encoder and keeps the top few. This pairs the bi-encoder's speed with the cross-encoder's precision and fixes the common case where the truly relevant passage sits a few ranks below a surface-similar distractor.",
+    "source_url": "https://developer.nvidia.com/blog/d37"
+  },
+  {
+    "id": "d38",
+    "title": "Why cosine similarity rewards surface overlap",
+    "text": "First-stage embeddings often rank a passage highly because it shares vocabulary with the query even when it does not answer it. Cosine similarity has no notion of the question being asked; it measures closeness in embedding space, where lexical and topical overlap pull vectors together. A reranker that reads both texts jointly is what separates relevant from merely similar.",
+    "source_url": "https://developer.nvidia.com/blog/d38"
+  },
+  {
+    "id": "d39",
+    "title": "Faithfulness measures grounding",
+    "text": "RAGAS faithfulness checks whether each claim in the generated answer is supported by the retrieved context. A low faithfulness score means the model is asserting things the context does not back \u2014 hallucination \u2014 and it usually points at retrieval that failed to surface the answer rather than at the generator itself.",
+    "source_url": "https://developer.nvidia.com/blog/d39"
+  },
+  {
+    "id": "d40",
+    "title": "Context precision and recall",
+    "text": "Context precision asks how much of the retrieved context is actually relevant, and context recall asks whether everything needed to answer was retrieved. Low recall caps the best answer the generator can give no matter how good it is, so diagnosing RAG quality starts with the retrieval metrics, not the prompt.",
+    "source_url": "https://developer.nvidia.com/blog/d40"
+  },
+  {
+    "id": "d41",
+    "title": "Temperature zero for deterministic routing",
+    "text": "When an LLM call must be reproducible \u2014 a router choosing a tool, or a classifier labeling an intent \u2014 set temperature to 0 so the model takes the most likely token at each step. Sampling temperature above 0 introduces run-to-run variation that is desirable for open generation but a liability for control flow.",
+    "source_url": "https://developer.nvidia.com/blog/d41"
+  },
+  {
+    "id": "d42",
+    "title": "Structured output with JSON schema",
+    "text": "Constraining a NIM to emit JSON that conforms to a schema turns free text into a parseable contract, which is essential when the output feeds another system. Schema-guided decoding rejects tokens that would break the structure, so the response is valid JSON by construction rather than by hopeful prompting.",
+    "source_url": "https://developer.nvidia.com/blog/d42"
+  },
+  {
+    "id": "d43",
+    "title": "NeMo Guardrails as a NIM",
+    "text": "NeMo Guardrails can run as its own NIM in front of the LLM to enforce input and output policies \u2014 blocking off-topic requests, masking sensitive data, and checking responses against a set of rails \u2014 without baking that logic into every application that calls the model.",
+    "source_url": "https://developer.nvidia.com/blog/d43"
+  },
+  {
+    "id": "d44",
+    "title": "Capacity planning from an SLA",
+    "text": "Sizing GPU infrastructure starts from the service-level target: a p99 time-to-first-token and a sustained requests-per-second. From the model size and the GPU's HBM bandwidth you estimate per-request decode cost, divide the target throughput by what one GPU sustains within the latency budget, and add headroom for traffic bursts and cold starts.",
+    "source_url": "https://developer.nvidia.com/blog/d44"
+  },
+  {
+    "id": "d45",
+    "title": "Quantization trades memory for a little quality",
+    "text": "Quantizing weights from FP16 to INT8 or FP8 shrinks the memory footprint and the bandwidth each decode step consumes, which directly raises throughput. Calibrated post-training quantization usually costs only a small, measurable drop in accuracy, and that drop should be validated on your own evaluation set before shipping.",
+    "source_url": "https://developer.nvidia.com/blog/d45"
+  },
+  {
+    "id": "d46",
+    "title": "Persisting the model cache in Kubernetes",
+    "text": "Mount a PersistentVolumeClaim at the NIM's cache path so the downloaded model and built engine survive pod restarts. Without it, every restart re-downloads tens of gigabytes from NGC and rebuilds the engine, turning a quick reschedule into a multi-minute cold start and wasting egress bandwidth.",
+    "source_url": "https://developer.nvidia.com/blog/d46"
+  },
+  {
+    "id": "d47",
+    "title": "GPU Operator and the device plugin",
+    "text": "The NVIDIA GPU Operator installs the driver, container toolkit, and device plugin a cluster needs to schedule GPU workloads. The device plugin advertises nvidia.com/gpu as a schedulable resource, which is the resource a NIM pod requests under resources.limits so Kubernetes places it on a GPU node.",
+    "source_url": "https://developer.nvidia.com/blog/d47"
+  },
+  {
+    "id": "d48",
+    "title": "Right-sizing GPU memory for a model",
+    "text": "A model's GPU memory budget is the sum of its weights, the KV cache for the concurrency you intend to serve, and activation and framework overhead. The KV term grows with sequence length and batch size, so a model that fits at low concurrency can run out of memory once traffic and context lengths climb.",
+    "source_url": "https://developer.nvidia.com/blog/d48"
+  },
+  {
+    "id": "d49",
+    "title": "Batch size and the latency-throughput trade-off",
+    "text": "Larger batches amortize the memory-bound decode step over more sequences and raise tokens-per-second, but each individual request waits longer, so per-user latency rises. The right operating point is the largest batch that still meets your p99 latency target, which continuous batching approaches automatically.",
+    "source_url": "https://developer.nvidia.com/blog/d49"
+  },
+  {
+    "id": "d50",
+    "title": "RAG beats fine-tuning for changing knowledge",
+    "text": "When the knowledge a system needs changes often \u2014 policies, prices, documentation \u2014 retrieval-augmented generation is usually the better tool than fine-tuning, because you update an index instead of retraining a model. Fine-tuning earns its keep for changing behavior and format, not for injecting facts that go stale.",
+    "source_url": "https://developer.nvidia.com/blog/d50"
+  }
+]

@@ -1,0 +1,188 @@
+version: '3'
+
+vars:
+  LAB: '{{.LAB | default "01-rag-fundamentals"}}'
+  STACK: '{{.STACK | default "dev"}}'
+  LABS_DIR: labs
+  INFRA_DIR: infra
+  # uv for the infra project. `env -u VIRTUAL_ENV` strips any venv the user has
+  # activated in their shell so uv resolves infra/.venv cleanly instead of warning
+  # that the activated (root) VIRTUAL_ENV "does not match". Task's own `env:` can't
+  # do this — it does not override an already-exported variable.
+  UVX: 'env -u VIRTUAL_ENV uv'
+
+dotenv: ['.env']
+
+env:
+  # Pulumi runs against a project-local filesystem backend — no Pulumi Cloud
+  # account or `pulumi login` required. State lives in infra/.pulumi (gitignored).
+  # The passphrase only protects local-file secrets in the dev stack; override it
+  # by exporting PULUMI_CONFIG_PASSPHRASE before running any infra task.
+  PULUMI_BACKEND_URL: 'file://{{.ROOT_DIR}}/{{.INFRA_DIR}}/.pulumi'
+  PULUMI_CONFIG_PASSPHRASE: '{{.PULUMI_CONFIG_PASSPHRASE | default "nvidia-labs"}}'
+
+tasks:
+
+  # ── Bootstrap ────────────────────────────────────────────────────────────────
+
+  setup:
+    desc: First-time setup — install deps, copy .env, init Pulumi dev stack
+    cmds:
+      - uv sync
+      - cd {{.INFRA_DIR}} && {{.UVX}} sync
+      - cp -n .env.example .env || true
+      - task: infra:init
+
+  # ── Lab tasks ─────────────────────────────────────────────────────────────────
+
+  lab:run:
+    desc: Launch Jupyter for a specific lab (task lab:run LAB=02-rag-reranking)
+    cmds:
+      - uv run jupyter lab {{.LABS_DIR}}/{{.LAB}}/lab.ipynb
+    requires:
+      vars: [LAB]
+
+  lab:test:
+    desc: Run nbmake + pytest for a specific lab (task lab:test LAB=02-rag-reranking)
+    cmds:
+      # Setup-only labs (e.g. 00-setup) have no notebook — skip nbmake for them.
+      - |
+        if [ -f {{.LABS_DIR}}/{{.LAB}}/lab.ipynb ]; then
+          uv run pytest --nbmake {{.LABS_DIR}}/{{.LAB}}/lab.ipynb -v
+        else
+          echo "No lab.ipynb for {{.LAB}} — skipping nbmake (setup-only lab)."
+        fi
+      - |
+        if [ -d {{.LABS_DIR}}/{{.LAB}}/tests ]; then
+          uv run pytest {{.LABS_DIR}}/{{.LAB}}/tests/ -v
+        else
+          echo "No tests/ for {{.LAB}}."
+        fi
+    requires:
+      vars: [LAB]
+
+  lab:test:all:
+    desc: Run all lab tests (CI mode)
+    cmds:
+      - uv run pytest --nbmake labs/ tests/ -v --tb=short
+
+  lab:data:generate:
+    desc: Generate synthetic lab data (task lab:data:generate LAB=02-rag-reranking)
+    cmds:
+      - uv run python {{.LABS_DIR}}/{{.LAB}}/data/generate.py
+    requires:
+      vars: [LAB]
+
+  lab:clean:
+    desc: Clear notebook outputs for a lab (task lab:clean LAB=02-rag-reranking)
+    cmds:
+      - uv run jupyter nbconvert --clear-output --inplace {{.LABS_DIR}}/{{.LAB}}/lab.ipynb
+
+  lab:clean:all:
+    desc: Clear all notebook outputs (before committing)
+    cmds:
+      - |
+        for nb in labs/*/lab.ipynb; do
+          uv run jupyter nbconvert --clear-output --inplace "$nb"
+        done
+
+  # ── Mock NIM ──────────────────────────────────────────────────────────────────
+
+  mock:start:
+    desc: Start local mock NIM server (FastAPI, no GPU required)
+    cmds:
+      - uv run uvicorn shared.mock_nim:app --port 8099 --reload &
+      - echo "Mock NIM running on http://localhost:8099"
+
+  mock:stop:
+    desc: Stop mock NIM server
+    cmds:
+      - pkill -f "mock_nim" || true
+
+  # ── Lint / format ─────────────────────────────────────────────────────────────
+
+  lint:
+    desc: Ruff lint + format check
+    cmds:
+      - uv run ruff check shared/ labs/
+      - uv run ruff format --check shared/ labs/
+
+  lint:fix:
+    desc: Auto-fix lint issues
+    cmds:
+      - uv run ruff check --fix shared/ labs/
+      - uv run ruff format shared/ labs/
+
+  # ── Decks ──────────────────────────────────────────────────────────────────────
+
+  deck:build:
+    desc: Build the combined RAG lecture deck (Labs 01–02) -> decks/*.pptx
+    cmds:
+      - uv run python decks/build_deck.py
+
+  # ── Infrastructure (Pulumi) ───────────────────────────────────────────────────
+
+  infra:init:
+    desc: Initialize Pulumi dev stack (local file backend, no cloud required)
+    dir: '{{.INFRA_DIR}}'
+    cmds:
+      - mkdir -p .pulumi
+      # Idempotent: select the stack if it exists, otherwise create it (init also
+      # selects). Avoids the noisy "stack already exists" error on re-runs.
+      - '{{.UVX}} run pulumi stack select dev 2>/dev/null || {{.UVX}} run pulumi stack init dev --non-interactive'
+
+  infra:up:
+    desc: Deploy infrastructure stack (task infra:up STACK=staging)
+    dir: '{{.INFRA_DIR}}'
+    cmds:
+      - '{{.UVX}} run pulumi stack select {{.STACK}}'
+      - '{{.UVX}} run pulumi up --yes'
+
+  infra:preview:
+    desc: Preview infrastructure changes (task infra:preview STACK=staging)
+    dir: '{{.INFRA_DIR}}'
+    cmds:
+      - '{{.UVX}} run pulumi stack select {{.STACK}}'
+      - '{{.UVX}} run pulumi preview'
+
+  infra:down:
+    desc: Tear down a stack (task infra:down STACK=staging)
+    dir: '{{.INFRA_DIR}}'
+    cmds:
+      - '{{.UVX}} run pulumi stack select {{.STACK}}'
+      - '{{.UVX}} run pulumi destroy --yes'
+    requires:
+      vars: [STACK]
+
+  infra:env:
+    desc: Pull stack outputs into .env (task infra:env STACK=staging)
+    dir: '{{.INFRA_DIR}}'
+    cmds:
+      - '{{.UVX}} run python scripts/export_env.py --stack {{.STACK}} --out ../.env'
+
+  infra:secrets:set:
+    desc: Set NVIDIA API key as Pulumi secret (prompts for value)
+    dir: '{{.INFRA_DIR}}'
+    cmds:
+      - '{{.UVX}} run pulumi config set --secret nvidia_api_key'
+
+  infra:refresh:
+    desc: Refresh Pulumi state from actual cloud resources
+    dir: '{{.INFRA_DIR}}'
+    cmds:
+      - '{{.UVX}} run pulumi stack select {{.STACK}}'
+      - '{{.UVX}} run pulumi refresh --yes'
+
+  # ── Utilities ─────────────────────────────────────────────────────────────────
+
+  nim:health:
+    desc: Check health of configured NIM endpoints
+    cmds:
+      - uv run python -c "from shared.nim_client import health_check; print(health_check())"
+
+  nim:profile:
+    desc: Show which TRT-LLM profile the running NIM selected
+    cmds:
+      - |
+        curl -s ${NIM_LLM_URL%/v1}/v2/models | uv run python -c \
+        "import sys,json; [print(m['name'], m.get('platform','')) for m in json.load(sys.stdin).get('models',[])]"

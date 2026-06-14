@@ -1,0 +1,10 @@
+{
+  "prepared_on": "NVIDIA H100 80GB HBM3 (dev workstation)",
+  "present_artifacts": [
+    "config.json",
+    "models/8835c31752fd/config.json",
+    "models/8835c31752fd/rank0.engine",
+    "tokenizer.json",
+    "tokenizer_config.json"
+  ]
+}

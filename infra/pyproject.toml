@@ -1,0 +1,18 @@
+[project]
+name = "nvidia-partner-labs-infra"
+version = "0.1.0"
+description = "Pulumi infrastructure for the NVIDIA Partner Lab Series"
+requires-python = ">=3.12"
+dependencies = [
+    "pulumi>=3.120",
+    "pulumi-aws>=6.40",
+    "pulumi-kubernetes>=4.14",
+    "pulumi-docker>=4.5",
+    "pydantic>=2.7",
+    "python-dotenv>=1.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]

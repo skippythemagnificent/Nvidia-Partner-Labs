@@ -1,0 +1,74 @@
+[
+  {
+    "id": "q01",
+    "question": "What is the daily limit on a wire transfer I request through online banking?",
+    "answer_doc_id": "p04",
+    "answer_span": "daily wire limit is $50,000 for online requests"
+  },
+  {
+    "id": "q02",
+    "question": "How long do I have to report an unauthorized charge on my debit card to limit my liability?",
+    "answer_doc_id": "p05",
+    "answer_span": "within sixty days of the statement to receive provisional credit"
+  },
+  {
+    "id": "q03",
+    "question": "How much is the monthly checking maintenance fee and how do I get it waived?",
+    "answer_doc_id": "p02",
+    "answer_span": "minimum daily balance of $1,500"
+  },
+  {
+    "id": "q04",
+    "question": "When does a deposited check become available if my account is brand new?",
+    "answer_doc_id": "p06",
+    "answer_span": "longer hold of up to seven business days"
+  },
+  {
+    "id": "q05",
+    "question": "Can I opt out of having my information shared for marketing?",
+    "answer_doc_id": "p07",
+    "answer_span": "right to opt out of that marketing"
+  },
+  {
+    "id": "q06",
+    "question": "Will my everyday debit card purchases be declined or charged an overdraft fee if my balance is too low?",
+    "answer_doc_id": "p03",
+    "answer_span": "not authorize or pay overdrafts on everyday debit card purchases"
+  },
+  {
+    "id": "q07",
+    "question": "Does paying off my personal loan early cost me anything?",
+    "answer_doc_id": "p09",
+    "answer_span": "no prepayment penalty"
+  },
+  {
+    "id": "q08",
+    "question": "What happens if the bank cannot verify my identity when I open an account?",
+    "answer_doc_id": "p08",
+    "answer_span": "may not be able to open the account"
+  },
+  {
+    "id": "q09",
+    "question": "What is the difference between the APR and the interest rate on a personal loan?",
+    "answer_doc_id": "p09",
+    "answer_span": "apr also includes any origination fee"
+  },
+  {
+    "id": "q10",
+    "question": "I sent a wire to the wrong person \u2014 can I get the money back?",
+    "answer_doc_id": "p04",
+    "answer_span": "request a recall, but the funds can only be returned"
+  },
+  {
+    "id": "q11",
+    "question": "How many withdrawals can I make from my savings account each month?",
+    "answer_doc_id": "p01",
+    "answer_span": "six convenient withdrawals or transfers per"
+  },
+  {
+    "id": "q12",
+    "question": "What should I do with my automatic payments before I close my account?",
+    "answer_doc_id": "p10",
+    "answer_span": "move or cancel any direct deposits and automatic payments"
+  }
+]

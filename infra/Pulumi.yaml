@@ -1,0 +1,6 @@
+name: nvidia-partner-labs-infra
+runtime:
+  name: python
+  options:
+    toolchain: uv
+description: NVIDIA Partner Lab Series infrastructure (dev / staging / prod stacks)

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "t01",
+    "account_id": "acct-1001",
+    "department": "billing",
+    "text": "I was charged twice for my subscription this month \u2014 I need a refund for the duplicate payment."
+  },
+  {
+    "id": "t02",
+    "account_id": "acct-1002",
+    "department": "technical",
+    "text": "Your API keeps returning 500 errors and the latency on the endpoint spiked after the last deploy."
+  },
+  {
+    "id": "t03",
+    "account_id": "acct-1003",
+    "department": "account",
+    "text": "I'm locked out after too many login attempts and my 2fa email never arrives."
+  },
+  {
+    "id": "t04",
+    "account_id": "acct-1004",
+    "department": "general",
+    "text": "Hello, quick question \u2014 where is the documentation for getting started?"
+  },
+  {
+    "id": "t05",
+    "account_id": "acct-1005",
+    "department": "billing",
+    "text": "Why did the price of my plan increase? The invoice shows a fee I don't recognize."
+  },
+  {
+    "id": "t06",
+    "account_id": "acct-1006",
+    "department": "technical",
+    "text": "The webhook endpoint times out intermittently and the request fails with a gateway error."
+  },
+  {
+    "id": "t07",
+    "account_id": "acct-1007",
+    "department": "billing",
+    "text": "I was charged for an API call that returned an error \u2014 can I get a refund for the failed request?"
+  },
+  {
+    "id": "t08",
+    "account_id": "acct-1008",
+    "department": "account",
+    "text": "A teammate can't log in to access the subscription seat we are paying for."
+  },
+  {
+    "id": "t09",
+    "account_id": "acct-1009",
+    "department": "account",
+    "text": "Please reset my password and grant permission to the new admin email on the account."
+  },
+  {
+    "id": "t10",
+    "account_id": "acct-1010",
+    "department": "technical",
+    "text": "After upgrading the SDK the client crashes on startup with a timeout connecting to the API."
+  },
+  {
+    "id": "t11",
+    "account_id": "acct-1011",
+    "department": "billing",
+    "text": "Cancel my subscription and refund the last invoice; I was billed after I downgraded."
+  },
+  {
+    "id": "t12",
+    "account_id": "acct-1012",
+    "department": "general",
+    "text": "Just wanted to leave some feedback \u2014 how do I share a feature request?"
+  }
+]

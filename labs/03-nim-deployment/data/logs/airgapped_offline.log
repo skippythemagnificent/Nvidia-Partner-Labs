@@ -1,0 +1,9 @@
+INFO 2025-11-03 15:02:10.500 launch.py:38] NIM for LLMs 1.3.0 starting for model "meta/llama-3.1-8b-instruct"
+INFO 2025-11-03 15:02:10.540 cache.py:51] NIM_CACHE_PATH=/opt/nim/.cache; NGC connectivity probe failed, entering offline mode (NIM_OFFLINE=1)
+INFO 2025-11-03 15:02:10.700 ngc_injector.py:152] Detected 1 GPU(s) on the host:
+INFO 2025-11-03 15:02:10.701 ngc_injector.py:153]   GPU 0: NVIDIA A100 80GB PCIe | compute capability 8.0 | 79.1 GiB free
+INFO 2025-11-03 15:02:10.980 ngc_injector.py:233] Selected profile: 6f1ac2d40b77 (tensorrt_llm-a100-fp16-tp1-throughput)
+INFO 2025-11-03 15:02:10.981 ngc_injector.py:240] Reason: A100 (sm80) does not support fp8; fp16 is the most-optimized compatible precision
+ERROR 2025-11-03 15:02:11.220 cache.py:142] Required artifact models/6f1ac2d40b77/rank0.engine for profile 6f1ac2d40b77 not found in /opt/nim/.cache and NGC is unreachable (NIM_OFFLINE=1)
+ERROR 2025-11-03 15:02:11.221 cache.py:148] Cached profiles on this host: [8835c31752fd (h100-fp8-tp1)]; requested profile: 6f1ac2d40b77 (a100-fp16-tp1)
+CRITICAL 2025-11-03 15:02:11.300 launch.py:96] Cannot materialize engine offline. Run `nim download-to-cache --profile 6f1ac2d40b77` on a connected host and copy /opt/nim/.cache to this node, or set NIM_MODEL_PROFILE to a cached profile.

@@ -1,0 +1,14 @@
+INFO 2025-11-03 09:14:02.001 launch.py:38] NIM for LLMs 1.3.0 starting for model "meta/llama-3.1-8b-instruct"
+INFO 2025-11-03 09:14:02.044 ngc_injector.py:152] Detected 1 GPU(s) on the host:
+INFO 2025-11-03 09:14:02.045 ngc_injector.py:153]   GPU 0: NVIDIA H100 80GB HBM3 | compute capability 9.0 | 79.6 GiB free
+INFO 2025-11-03 09:14:02.310 ngc_injector.py:201] Inspecting 6 model profile(s) in the manifest for compatible hardware
+INFO 2025-11-03 09:14:02.522 ngc_injector.py:233] Selected profile: 8835c31752fd (tensorrt_llm-h100-fp8-tp1-throughput)
+INFO 2025-11-03 09:14:02.523 ngc_injector.py:234]   backend=tensorrt_llm precision=fp8 tp=1 pp=1 gpu=h100 kind=throughput
+INFO 2025-11-03 09:14:02.524 ngc_injector.py:240] Reason: most-optimized profile compatible with 1x H100 (sm90 supports fp8); override with NIM_MODEL_PROFILE
+INFO 2025-11-03 09:14:03.900 cache.py:88] Profile artifacts found in /opt/nim/.cache; skipping NGC download
+INFO 2025-11-03 09:14:31.220 trtllm.py:144] Loading prebuilt TRT-LLM engine for profile 8835c31752fd (no compilation required)
+INFO 2025-11-03 09:15:58.402 trtllm.py:201] KV cache allocated: 17.9 GiB across 7340 blocks of 16 tokens (max 117440 tokens); gpu_memory_utilization=0.90
+INFO 2025-11-03 09:15:58.404 trtllm.py:205] Runtime limits: max_num_seqs=48 max_model_len=4096
+INFO 2025-11-03 09:16:10.110 server.py:412] Triton inference server ready (grpc :8001, http :8000, metrics :8002)
+INFO 2025-11-03 09:16:30.044 api_server.py:88] Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO 2025-11-03 09:16:31.500 api_server.py:120] First inference OK: TTFT=243 ms, generated 128 tokens at 71.4 tok/s

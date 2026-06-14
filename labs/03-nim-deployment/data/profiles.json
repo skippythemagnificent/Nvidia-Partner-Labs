@@ -1,0 +1,108 @@
+{
+  "model": "meta/llama-3.1-8b-instruct",
+  "nim_version": "1.3.0",
+  "profiles": [
+    {
+      "id": "8835c31752fd",
+      "backend": "tensorrt_llm",
+      "gpu": "h100",
+      "compute_capability": "9.0",
+      "precision": "fp8",
+      "tp": 1,
+      "pp": 1,
+      "kind": "throughput",
+      "artifacts": [
+        "config.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "models/8835c31752fd/config.json",
+        "models/8835c31752fd/rank0.engine"
+      ]
+    },
+    {
+      "id": "a47e9b13c205",
+      "backend": "tensorrt_llm",
+      "gpu": "h100",
+      "compute_capability": "9.0",
+      "precision": "fp16",
+      "tp": 1,
+      "pp": 1,
+      "kind": "latency",
+      "artifacts": [
+        "config.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "models/a47e9b13c205/config.json",
+        "models/a47e9b13c205/rank0.engine"
+      ]
+    },
+    {
+      "id": "6f1ac2d40b77",
+      "backend": "tensorrt_llm",
+      "gpu": "a100",
+      "compute_capability": "8.0",
+      "precision": "fp16",
+      "tp": 1,
+      "pp": 1,
+      "kind": "throughput",
+      "artifacts": [
+        "config.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "models/6f1ac2d40b77/config.json",
+        "models/6f1ac2d40b77/rank0.engine"
+      ]
+    },
+    {
+      "id": "b2d8e6740199",
+      "backend": "tensorrt_llm",
+      "gpu": "a100",
+      "compute_capability": "8.0",
+      "precision": "fp16",
+      "tp": 2,
+      "pp": 1,
+      "kind": "throughput",
+      "artifacts": [
+        "config.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "models/b2d8e6740199/config.json",
+        "models/b2d8e6740199/rank0.engine",
+        "models/b2d8e6740199/rank1.engine"
+      ]
+    },
+    {
+      "id": "c90af5e21b6d",
+      "backend": "tensorrt_llm",
+      "gpu": "l40s",
+      "compute_capability": "8.9",
+      "precision": "fp8",
+      "tp": 1,
+      "pp": 1,
+      "kind": "throughput",
+      "artifacts": [
+        "config.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "models/c90af5e21b6d/config.json",
+        "models/c90af5e21b6d/rank0.engine"
+      ]
+    },
+    {
+      "id": "0f4e7a9c8db3",
+      "backend": "vllm",
+      "gpu": "any",
+      "compute_capability": null,
+      "precision": "fp16",
+      "tp": 1,
+      "pp": 1,
+      "kind": "generic",
+      "artifacts": [
+        "config.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "model.safetensors"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+config:
+  nvidia-partner-labs-infra:use_mock_nim: "true"
+encryptionsalt: v1:nXEo7ZVOqlg=:v1:fhzWBWwVeL1VK6tw:7ugQC+wF7/PJOrjw9NkHBbgssQNKGQ==

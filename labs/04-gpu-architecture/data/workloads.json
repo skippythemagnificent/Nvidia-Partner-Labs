@@ -1,0 +1,31 @@
+{
+  "workloads": [
+    {
+      "id": "chat",
+      "name": "Interactive multi-tenant chat",
+      "target_rps": 50,
+      "input_tokens": 1024,
+      "output_tokens": 256,
+      "ttft_ms_sla": 500,
+      "itl_ms_sla": 40
+    },
+    {
+      "id": "rag",
+      "name": "RAG question answering",
+      "target_rps": 30,
+      "input_tokens": 3000,
+      "output_tokens": 400,
+      "ttft_ms_sla": 800,
+      "itl_ms_sla": 50
+    },
+    {
+      "id": "summarize",
+      "name": "Long-context batch summarization",
+      "target_rps": 8,
+      "input_tokens": 6000,
+      "output_tokens": 800,
+      "ttft_ms_sla": 4000,
+      "itl_ms_sla": 80
+    }
+  ]
+}

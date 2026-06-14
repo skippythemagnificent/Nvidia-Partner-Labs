@@ -1,0 +1,39 @@
+# HELP request_success_total Successful inference requests (cumulative).
+# TYPE request_success_total counter
+request_success_total{model="llama-3.1-8b-instruct",version="1"} 152453
+# HELP request_failure_total Failed inference requests (cumulative).
+# TYPE request_failure_total counter
+request_failure_total{model="llama-3.1-8b-instruct",version="1"} 1177
+# HELP generation_tokens_total Output tokens generated (cumulative).
+# TYPE generation_tokens_total counter
+generation_tokens_total{model="llama-3.1-8b-instruct"} 46288816
+# HELP num_requests_running In-flight requests being decoded right now.
+# TYPE num_requests_running gauge
+num_requests_running{model="llama-3.1-8b-instruct"} 46
+# HELP num_requests_waiting Requests queued waiting for a KV-cache slot.
+# TYPE num_requests_waiting gauge
+num_requests_waiting{model="llama-3.1-8b-instruct"} 41
+# HELP gpu_cache_usage_perc Fraction of the KV cache in use (0-1).
+# TYPE gpu_cache_usage_perc gauge
+gpu_cache_usage_perc{model="llama-3.1-8b-instruct"} 0.99
+# HELP time_to_first_token_seconds_p99 TTFT 99th percentile (seconds).
+# TYPE time_to_first_token_seconds_p99 gauge
+time_to_first_token_seconds_p99{model="llama-3.1-8b-instruct"} 0.880
+# HELP inter_token_latency_seconds_p99 ITL 99th percentile (seconds).
+# TYPE inter_token_latency_seconds_p99 gauge
+inter_token_latency_seconds_p99{model="llama-3.1-8b-instruct"} 0.070
+# HELP DCGM_FI_DEV_GPU_UTIL GPU utilization (%).
+# TYPE DCGM_FI_DEV_GPU_UTIL gauge
+DCGM_FI_DEV_GPU_UTIL{gpu="0",UUID="GPU-3a1f7c0e-1b2d-4e5a-9f00-2c4b6d8e0a11"} 99
+# HELP DCGM_FI_PROF_SM_ACTIVE Fraction of SMs active (0-1).
+# TYPE DCGM_FI_PROF_SM_ACTIVE gauge
+DCGM_FI_PROF_SM_ACTIVE{gpu="0",UUID="GPU-3a1f7c0e-1b2d-4e5a-9f00-2c4b6d8e0a11"} 0.931
+# HELP DCGM_FI_DEV_FB_USED Frame-buffer memory used (MiB).
+# TYPE DCGM_FI_DEV_FB_USED gauge
+DCGM_FI_DEV_FB_USED{gpu="0",UUID="GPU-3a1f7c0e-1b2d-4e5a-9f00-2c4b6d8e0a11"} 75210
+# HELP DCGM_FI_DEV_POWER_USAGE Power draw (W).
+# TYPE DCGM_FI_DEV_POWER_USAGE gauge
+DCGM_FI_DEV_POWER_USAGE{gpu="0",UUID="GPU-3a1f7c0e-1b2d-4e5a-9f00-2c4b6d8e0a11"} 681.4
+# HELP DCGM_FI_DEV_GPU_TEMP GPU temperature (C).
+# TYPE DCGM_FI_DEV_GPU_TEMP gauge
+DCGM_FI_DEV_GPU_TEMP{gpu="0",UUID="GPU-3a1f7c0e-1b2d-4e5a-9f00-2c4b6d8e0a11"} 78

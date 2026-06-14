@@ -1,0 +1,7 @@
+config:
+  nvidia-partner-labs-infra:nim_embed_model: nvidia/nv-embedqa-e5-v5
+  nvidia-partner-labs-infra:nim_rerank_model: nvidia/nv-rerankqa-mistral-4b-v3
+  nvidia-partner-labs-infra:nim_llm_model: meta/llama-3.1-70b-instruct
+  nvidia-partner-labs-infra:gpu_count: "4"
+  nvidia-partner-labs-infra:k8s_namespace: nvidia-labs-prod
+  # kubernetes:context: prod-cluster

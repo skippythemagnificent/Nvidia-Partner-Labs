@@ -1,0 +1,26 @@
+{
+  "models": [
+    {
+      "id": "llama31_8b",
+      "name": "Llama-3.1-8B-Instruct",
+      "params": 8030000000,
+      "num_layers": 32,
+      "hidden": 4096,
+      "attn_heads": 32,
+      "kv_heads": 8,
+      "head_dim": 128,
+      "kv_bytes_per_token_fp16": 131072
+    },
+    {
+      "id": "llama31_70b",
+      "name": "Llama-3.1-70B-Instruct",
+      "params": 70600000000,
+      "num_layers": 80,
+      "hidden": 8192,
+      "attn_heads": 64,
+      "kv_heads": 8,
+      "head_dim": 128,
+      "kv_bytes_per_token_fp16": 327680
+    }
+  ]
+}

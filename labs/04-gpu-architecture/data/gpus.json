@@ -1,0 +1,48 @@
+{
+  "gpus": [
+    {
+      "id": "h100_sxm",
+      "name": "H100 80GB SXM5",
+      "form_factor": "SXM5",
+      "memory_gb": 80,
+      "mem_bandwidth_gb_s": 3352,
+      "fp16_tflops": 989.5,
+      "fp8_tflops": 1978.9,
+      "nvlink_gb_s": 900,
+      "usd_per_hr": 3.0
+    },
+    {
+      "id": "h100_pcie",
+      "name": "H100 80GB PCIe",
+      "form_factor": "PCIe",
+      "memory_gb": 80,
+      "mem_bandwidth_gb_s": 2039,
+      "fp16_tflops": 756.5,
+      "fp8_tflops": 1513.0,
+      "nvlink_gb_s": 600,
+      "usd_per_hr": 2.4
+    },
+    {
+      "id": "a100_80_sxm",
+      "name": "A100 80GB SXM4",
+      "form_factor": "SXM4",
+      "memory_gb": 80,
+      "mem_bandwidth_gb_s": 2039,
+      "fp16_tflops": 312.0,
+      "fp8_tflops": null,
+      "nvlink_gb_s": 600,
+      "usd_per_hr": 1.8
+    },
+    {
+      "id": "l40s",
+      "name": "L40S 48GB",
+      "form_factor": "PCIe",
+      "memory_gb": 48,
+      "mem_bandwidth_gb_s": 864,
+      "fp16_tflops": 362.0,
+      "fp8_tflops": 733.0,
+      "nvlink_gb_s": null,
+      "usd_per_hr": 1.0
+    }
+  ]
+}

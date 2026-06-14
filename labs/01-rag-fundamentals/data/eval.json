@@ -1,0 +1,74 @@
+[
+  {
+    "id": "q01",
+    "question": "What username do I use to authenticate Docker against NGC to pull NIM images?",
+    "answer_doc_id": "d03",
+    "answer_span": "$oauthtoken"
+  },
+  {
+    "id": "q02",
+    "question": "Which input_type should I pass when embedding a user's question with NV-EmbedQA?",
+    "answer_doc_id": "d11",
+    "answer_span": "set to query for the user's question"
+  },
+  {
+    "id": "q03",
+    "question": "What dimensionality do NV-EmbedQA-E5-v5 vectors have?",
+    "answer_doc_id": "d13",
+    "answer_span": "1024-dimensional vectors"
+  },
+  {
+    "id": "q04",
+    "question": "How does continuous batching keep the GPU busy under bursty traffic?",
+    "answer_doc_id": "d09",
+    "answer_span": "admits new requests into the running batch"
+  },
+  {
+    "id": "q05",
+    "question": "What value enables prefix KV-cache reuse in NIM?",
+    "answer_doc_id": "d07",
+    "answer_span": "set nim_enable_kv_cache_reuse to 1"
+  },
+  {
+    "id": "q06",
+    "question": "Which endpoint should a load balancer use to know a NIM can serve traffic?",
+    "answer_doc_id": "d23",
+    "answer_span": "/v2/health/ready returns 200 only after the model is loaded"
+  },
+  {
+    "id": "q07",
+    "question": "How do I deploy a NIM offline with no internet access?",
+    "answer_doc_id": "d25",
+    "answer_span": "pre-download the model profile into a cache directory"
+  },
+  {
+    "id": "q08",
+    "question": "Why is my very first NIM request so slow when the GPU is sitting idle?",
+    "answer_doc_id": "d21",
+    "answer_span": "latency you see on request one is dominated by model load"
+  },
+  {
+    "id": "q09",
+    "question": "On which port does Triton expose Prometheus metrics?",
+    "answer_doc_id": "d33",
+    "answer_span": "prometheus metrics on port 8002"
+  },
+  {
+    "id": "q10",
+    "question": "What is the difference between a bi-encoder and a cross-encoder?",
+    "answer_doc_id": "d36",
+    "answer_span": "cross-encoder reranker reads the query and a passage together"
+  },
+  {
+    "id": "q11",
+    "question": "How many instances can MIG split an H100 into?",
+    "answer_doc_id": "d26",
+    "answer_span": "as many as seven isolated"
+  },
+  {
+    "id": "q12",
+    "question": "What does RAGAS faithfulness measure?",
+    "answer_doc_id": "d39",
+    "answer_span": "each claim in the generated answer is supported by the retrieved context"
+  }
+]

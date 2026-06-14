@@ -1,0 +1,386 @@
+# /// script
+# requires-python = ">=3.12"
+# dependencies = []
+# ///
+"""Generate the Lab 02 corpus and evaluation set.
+
+Run with:  uv run python labs/02-rag-reranking/data/generate.py
+       or:  task lab:data:generate LAB=02-rag-reranking
+
+Writes two files next to this script:
+
+  - corpus.json : 10 synthetic retail-banking / fintech policy documents. Each is
+                  a realistic multi-paragraph policy (account agreement, fee
+                  schedule, disputes, wires, etc.) so that, once chunked, a single
+                  document yields many candidate passages — the setting where a
+                  two-stage retrieve-then-rerank pipeline matters.
+  - eval.json   : 12 labeled questions. Each names the doc that answers it and the
+                  verbatim `answer_span` that must appear in a retrieved chunk.
+                  Several questions are written so the bi-encoder ranks a
+                  surface-similar but wrong passage above the real answer — the
+                  case the cross-encoder reranker is meant to fix.
+
+Hand-authored (not LLM-generated) so the corpus is stable and the rerank
+demonstrations stay reproducible. The content is illustrative policy prose, not
+legal or financial advice.
+"""
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+HERE = Path(__file__).parent
+BANK = "Northwind Bank, N.A. (fictional)"
+
+CORPUS: list[dict[str, str]] = [
+    {
+        "id": "p01",
+        "title": "Deposit Account Agreement",
+        "category": "accounts",
+        "text": (
+            "This Deposit Account Agreement governs personal checking and savings "
+            "accounts. To open an account you must be at least 18 years old, provide a "
+            "government-issued photo ID, and make a minimum opening deposit of $25 for "
+            "checking or $100 for savings. Each account is owned individually unless you "
+            "elect joint ownership with rights of survivorship at opening. "
+            "A personal checking account does not earn interest, while a savings account "
+            "earns interest that is compounded daily and credited monthly. "
+            "Savings accounts are limited to six convenient withdrawals or transfers per "
+            "monthly statement cycle; transfers beyond that limit may be declined or "
+            "converted to a checking account. "
+            "Joint owners are each individually liable for the full balance and any fees, "
+            "and any single owner may close the account or withdraw the entire balance. "
+            "You agree to review each monthly statement and report errors promptly. "
+            "We may place a hold on the account, or close it, if we suspect fraud or "
+            "unlawful activity. "
+            "Accounts with a zero balance for sixty consecutive days may be closed "
+            "automatically without further notice."
+        ),
+    },
+    {
+        "id": "p02",
+        "title": "Schedule of Fees and Service Charges",
+        "category": "fees",
+        "text": (
+            "The monthly maintenance fee for a personal checking account is $12, and it is "
+            "waived in any cycle where you maintain a minimum daily balance of $1,500 or "
+            "receive qualifying direct deposits totaling at least $500. "
+            "The savings account monthly fee is $5 and is waived with a $300 minimum daily "
+            "balance. "
+            "Each withdrawal at a non-network ATM costs $3 in addition to any fee charged "
+            "by the ATM operator; in-network ATM withdrawals are free. "
+            "A domestic outgoing wire transfer costs $25 and an international outgoing wire "
+            "costs $45; incoming wires are $15 each. "
+            "Ordering paper checks, a cashier's check, or a stop-payment request each carry "
+            "separate fees disclosed at the time of the request. "
+            "We charge a $35 overdraft fee and a $35 returned-item (NSF) fee, and no more "
+            "than four such fees are assessed per business day. "
+            "A dormant account is charged a $5 monthly inactivity fee after twelve months "
+            "with no customer-initiated activity. "
+            "Fees are debited from the account on the last business day of the cycle and "
+            "appear on your statement."
+        ),
+    },
+    {
+        "id": "p03",
+        "title": "Overdraft and Nonsufficient Funds Policy",
+        "category": "overdraft",
+        "text": (
+            "An overdraft occurs when you do not have enough available funds to cover a "
+            "transaction but we pay it anyway; a nonsufficient funds (NSF) item occurs when "
+            "we decline or return the transaction unpaid. "
+            "Standard overdraft coverage applies to checks and automatic ACH payments by "
+            "default. "
+            "We will not authorize or pay overdrafts on everyday debit card purchases or ATM "
+            "withdrawals unless you opt in to that service, as required by Regulation E. "
+            "If you do not opt in, those transactions are simply declined at no charge. "
+            "When we pay an overdraft we charge the overdraft fee disclosed in the fee "
+            "schedule; when we return an item unpaid we charge the NSF fee. "
+            "You can avoid both by linking a savings account as overdraft protection, which "
+            "transfers available funds automatically for a $10 transfer fee per day. "
+            "We post transactions each business day, generally crediting deposits before "
+            "debiting payments, and process larger checks before smaller ones. "
+            "Any negative balance must be repaid promptly, and accounts overdrawn for more "
+            "than thirty days may be closed and reported to a consumer agency."
+        ),
+    },
+    {
+        "id": "p04",
+        "title": "Wire Transfer Policy",
+        "category": "wires",
+        "text": (
+            "A wire transfer moves funds electronically and, once executed, is generally "
+            "final and cannot be reversed without the receiving bank's cooperation. "
+            "To send a wire you must submit complete beneficiary details — name, account "
+            "number, and the receiving bank's routing or SWIFT code — in person or through "
+            "verified online banking. "
+            "The cutoff time for same-day processing is 3:00 p.m. local time; requests after "
+            "the cutoff are processed the next business day. "
+            "Domestic wires usually settle the same business day, while international wires "
+            "may take two to five business days depending on the corridor and intermediary "
+            "banks. "
+            "The standard daily wire limit is $50,000 for online requests and higher limits "
+            "require in-branch verification and a callback to a number on file. "
+            "International wires sent in U.S. dollars may be converted by the beneficiary "
+            "bank at its own exchange rate, which we do not control. "
+            "If you send a wire to the wrong beneficiary you may request a recall, but the "
+            "funds can only be returned if the receiving bank and beneficiary agree. "
+            "We screen every wire against sanctions lists, which can delay or block a "
+            "transfer that matches a flagged party."
+        ),
+    },
+    {
+        "id": "p05",
+        "title": "Card Disputes and Unauthorized Transactions",
+        "category": "disputes",
+        "text": (
+            "If you see a transaction you did not authorize, contact us immediately so we can "
+            "block the card and open a dispute. "
+            "For unauthorized electronic fund transfers on a debit card, your liability is "
+            "limited if you notify us within two business days of learning of the loss, and "
+            "report unauthorized transactions within sixty days of the statement to receive "
+            "provisional credit while we investigate. "
+            "We will provisionally credit the disputed amount within ten business days of "
+            "your claim and complete most investigations within forty-five days. "
+            "A billing-error dispute on a credit card is different: you must send written "
+            "notice within sixty days of the statement that showed the error, and we will not "
+            "report the disputed amount as delinquent while it is under review. "
+            "A merchant chargeback — for goods not received or not as described — first "
+            "requires that you attempt to resolve the issue with the merchant. "
+            "Disputes about the quality of goods or services are handled under card-network "
+            "chargeback rules, not the unauthorized-transaction rules. "
+            "Keep your PIN confidential; sharing it voluntarily may make a resulting "
+            "transaction authorized and therefore ineligible for a dispute. "
+            "Once a dispute is resolved we send a written explanation, and any provisional "
+            "credit that is not upheld will be reversed after a five-day notice."
+        ),
+    },
+    {
+        "id": "p06",
+        "title": "Funds Availability Policy",
+        "category": "availability",
+        "text": (
+            "This policy explains when funds you deposit become available for withdrawal, in "
+            "accordance with Regulation CC. "
+            "Cash deposited in person and incoming wire transfers are available on the same "
+            "business day we receive them. "
+            "Funds from electronic direct deposits, such as payroll, are available on the day "
+            "we receive the payment file. "
+            "For most check deposits the first $225 is available the next business day and the "
+            "remainder is available on the second business day after the deposit. "
+            "Deposits made at an ATM after the 9:00 p.m. cutoff, or on a weekend or holiday, "
+            "are considered received the next business day. "
+            "We may place a longer hold of up to seven business days on a check if the account "
+            "is new, if you are redepositing a check that was returned unpaid, or if you "
+            "deposit more than $5,525 in checks on one day. "
+            "When we delay availability we give you a notice stating the reason and the day the "
+            "funds will be released. "
+            "A deposited check that is later returned unpaid will be charged back to your "
+            "account even if the funds were already made available."
+        ),
+    },
+    {
+        "id": "p07",
+        "title": "Privacy Notice and Information Sharing",
+        "category": "privacy",
+        "text": (
+            "This notice describes how we collect, use, and share your personal financial "
+            "information, as required by the Gramm-Leach-Bliley Act. "
+            "We collect information such as your account balances, transaction history, and "
+            "the details you provide on applications. "
+            "We share information to run the business — to process transactions, maintain "
+            "your account, respond to court orders, and report to credit bureaus — and you "
+            "cannot opt out of these operational uses. "
+            "We may also share information with affiliates and with nonaffiliated companies "
+            "for joint marketing, and you have the right to opt out of that marketing "
+            "sharing. "
+            "To opt out, call the number on the notice or update your preferences in online "
+            "banking; your choice stays in effect until you change it. "
+            "We do not sell your personal information. "
+            "We protect your information with physical, electronic, and procedural "
+            "safeguards, and we limit employee access to those who need it. "
+            "If you close your account we continue to apply this notice to the information we "
+            "retain."
+        ),
+    },
+    {
+        "id": "p08",
+        "title": "Customer Identification and Verification",
+        "category": "identity",
+        "text": (
+            "Federal law requires us to obtain, verify, and record information that "
+            "identifies each person who opens an account, under our Customer Identification "
+            "Program. "
+            "When you apply we ask for your name, date of birth, residential address, and a "
+            "taxpayer identification number such as a Social Security number. "
+            "We may ask to see your driver's license or other identifying documents and may "
+            "verify your identity through a third-party data service. "
+            "If we cannot verify your identity from the information you provide, we may not be "
+            "able to open the account or may close it after opening. "
+            "We periodically refresh this information and may ask you to confirm it, "
+            "especially for larger or international transactions. "
+            "We are required to report certain cash transactions over $10,000 and to file "
+            "reports on activity that appears suspicious. "
+            "Providing false identifying information is grounds for immediate account closure "
+            "and may be referred to authorities. "
+            "Business accounts require additional documentation, including formation documents "
+            "and the identities of beneficial owners who control the entity."
+        ),
+    },
+    {
+        "id": "p09",
+        "title": "Personal Loan and Annual Percentage Rate Terms",
+        "category": "lending",
+        "text": (
+            "A personal loan is an unsecured installment loan repaid in fixed monthly "
+            "payments over a term of twelve to sixty months. "
+            "The annual percentage rate, or APR, reflects the interest rate plus certain "
+            "costs and is the figure you should use to compare the true cost of borrowing. "
+            "Your APR is fixed for the life of the loan and is determined at approval based on "
+            "your credit profile, income, and the loan term you choose. "
+            "Interest accrues daily on the outstanding principal, so paying early in the cycle "
+            "reduces the interest you owe. "
+            "There is no prepayment penalty; you may pay the loan off in full at any time and "
+            "save the remaining interest. "
+            "A payment received more than fifteen days after its due date may incur a late fee "
+            "of $15 or 5% of the payment, whichever is less. "
+            "Missing payments can lower your credit score and, after ninety days of "
+            "delinquency, the loan may be placed in default and the full balance demanded. "
+            "The APR on a personal loan is not the same as the interest rate quoted alone, "
+            "because the APR also includes any origination fee spread across the term."
+        ),
+    },
+    {
+        "id": "p10",
+        "title": "Account Closing, Dormancy, and Complaints",
+        "category": "closing",
+        "text": (
+            "You may close your account at any time by visiting a branch or sending a signed "
+            "written request, provided the balance is not negative. "
+            "Before closing, move or cancel any direct deposits and automatic payments so they "
+            "are not returned after the account is closed. "
+            "We will mail a check for any remaining balance to your address on file within ten "
+            "business days. "
+            "An account with no customer-initiated activity for twelve months is considered "
+            "dormant and may be charged the inactivity fee until activity resumes. "
+            "If an account stays dormant and we cannot reach you, the balance may eventually be "
+            "turned over to the state as unclaimed property under escheatment law. "
+            "To raise a complaint, contact our support line first; if you are not satisfied you "
+            "may submit a written complaint and we will acknowledge it within five business "
+            "days. "
+            "We aim to resolve complaints within thirty days and will tell you the outcome in "
+            "writing. "
+            "If you remain dissatisfied you may escalate the matter to your banking regulator, "
+            "whose contact details are provided on request."
+        ),
+    },
+]
+
+# Labeled questions. `answer_span` is a verbatim, lowercase-comparable substring of
+# the named doc. Items tagged hard=True are phrased to share surface words with a
+# competing document so the bi-encoder mis-ranks them (the reranker's job to fix).
+EVAL: list[dict] = [
+    {
+        "id": "q01",
+        "question": "What is the daily limit on a wire transfer I request through online banking?",
+        "answer_doc_id": "p04",
+        "answer_span": "daily wire limit is $50,000 for online requests",
+    },
+    {
+        "id": "q02",
+        "question": "How long do I have to report an unauthorized charge on my debit card to limit my liability?",
+        "answer_doc_id": "p05",
+        "answer_span": "within sixty days of the statement to receive\nprovisional credit".replace("\n", " "),
+    },
+    {
+        "id": "q03",
+        "question": "How much is the monthly checking maintenance fee and how do I get it waived?",
+        "answer_doc_id": "p02",
+        "answer_span": "minimum daily balance of $1,500",
+    },
+    {
+        "id": "q04",
+        "question": "When does a deposited check become available if my account is brand new?",
+        "answer_doc_id": "p06",
+        "answer_span": "longer hold of up to seven business days",
+    },
+    {
+        "id": "q05",
+        "question": "Can I opt out of having my information shared for marketing?",
+        "answer_doc_id": "p07",
+        "answer_span": "right to opt out of that marketing",
+    },
+    {
+        # hard: "charge"/"fee"/"overdraft" overlap p02 and p03 strongly.
+        "id": "q06",
+        "question": "Will my everyday debit card purchases be declined or charged an overdraft fee if my balance is too low?",
+        "answer_doc_id": "p03",
+        "answer_span": "not authorize or pay overdrafts on everyday debit card purchases",
+    },
+    {
+        "id": "q07",
+        "question": "Does paying off my personal loan early cost me anything?",
+        "answer_doc_id": "p09",
+        "answer_span": "no prepayment penalty",
+    },
+    {
+        # hard: shares "identity"/"verify" language; competes with p01 opening rules.
+        "id": "q08",
+        "question": "What happens if the bank cannot verify my identity when I open an account?",
+        "answer_doc_id": "p08",
+        "answer_span": "may not be\nable to open the account".replace("\n", " "),
+    },
+    {
+        "id": "q09",
+        "question": "What is the difference between the APR and the interest rate on a personal loan?",
+        "answer_doc_id": "p09",
+        "answer_span": "apr also includes any origination fee",
+    },
+    {
+        # hard: "wrong"/"return"/"recall" overlaps p06 (returned check) and p05 (dispute).
+        "id": "q10",
+        "question": "I sent a wire to the wrong person — can I get the money back?",
+        "answer_doc_id": "p04",
+        "answer_span": "request a recall, but the\nfunds can only be returned".replace("\n", " "),
+    },
+    {
+        "id": "q11",
+        "question": "How many withdrawals can I make from my savings account each month?",
+        "answer_doc_id": "p01",
+        "answer_span": "six convenient withdrawals or transfers per",
+    },
+    {
+        # hard: "close"/"balance"/"dormant" overlaps p01 and p02 (inactivity fee).
+        "id": "q12",
+        "question": "What should I do with my automatic payments before I close my account?",
+        "answer_doc_id": "p10",
+        "answer_span": "move or cancel any direct deposits and automatic payments",
+    },
+]
+
+
+def _validate() -> None:
+    ids = [d["id"] for d in CORPUS]
+    assert len(ids) == len(set(ids)), "duplicate doc id"
+    assert len(CORPUS) == 10, f"expected 10 docs, got {len(CORPUS)}"
+    by_id = {d["id"]: d for d in CORPUS}
+    for item in EVAL:
+        doc = by_id.get(item["answer_doc_id"])
+        assert doc is not None, f"{item['id']} -> missing doc {item['answer_doc_id']}"
+        assert item["answer_span"].lower() in doc["text"].lower(), (
+            f"{item['id']} answer_span not a verbatim substring of {doc['id']}"
+        )
+
+
+def main() -> None:
+    _validate()
+    for d in CORPUS:
+        d.setdefault("source", BANK)
+    (HERE / "corpus.json").write_text(json.dumps(CORPUS, indent=2) + "\n")
+    (HERE / "eval.json").write_text(json.dumps(EVAL, indent=2) + "\n")
+    print(f"[ok] wrote {len(CORPUS)} docs  -> {HERE / 'corpus.json'}")
+    print(f"[ok] wrote {len(EVAL)} queries -> {HERE / 'eval.json'}")
+
+
+if __name__ == "__main__":
+    main()

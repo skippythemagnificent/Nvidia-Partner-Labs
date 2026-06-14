@@ -1,0 +1,30 @@
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+.env
+.DS_Store
+.idea/
+.vscode/
+
+claude.md
+CLAUDE.md
+
+# Solutions are instructor-only on learner branch
+# solutions/
+
+# Pulumi
+Pulumi.*.yaml.bak
+.pulumi/
+
+# Lab artifacts
+labs/*/data/*.parquet
+labs/*/data/*.sqlite
+chroma_db/
+
+# Generated decks (rebuild with: task deck:build)
+decks/*.pptx

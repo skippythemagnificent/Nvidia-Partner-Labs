@@ -1,0 +1,10 @@
+INFO 2025-11-03 11:08:55.012 server.py:412] Triton inference server ready; accepting traffic
+INFO 2025-11-03 11:41:03.220 executor.py:298] Load ramp: 64 concurrent client streams, mean prompt 1200 tokens, max_tokens=512
+WARNING 2025-11-03 11:41:07.880 executor.py:332] KV cache utilization 0.97 (7120/7340 blocks); scheduler queue depth 41
+WARNING 2025-11-03 11:41:08.119 executor.py:355] Preempting 3 in-flight request(s) to reclaim KV cache blocks; affected sequences will be recomputed
+ERROR 2025-11-03 11:41:08.450 scheduler.py:511] Request req-3f2a91 rejected: needs 4096 tokens but 0 free KV cache blocks (max_num_seqs=48 in flight, max_model_len=4096)
+ERROR 2025-11-03 11:41:08.451 api_server.py:233] HTTP 503 for req-3f2a91: "no available kv cache blocks; server overloaded, retry later"
+WARNING 2025-11-03 11:41:08.460 executor.py:332] KV cache utilization 1.00 (7340/7340 blocks); scheduler queue depth 47
+ERROR 2025-11-03 11:41:09.002 scheduler.py:511] Request req-3f2b04 rejected: needs 4096 tokens but 0 free KV cache blocks (max_num_seqs=48 in flight, max_model_len=4096)
+ERROR 2025-11-03 11:41:09.003 api_server.py:233] HTTP 503 for req-3f2b04: "no available kv cache blocks; server overloaded, retry later"
+INFO 2025-11-03 11:41:14.700 executor.py:298] Load drained to 22 concurrent streams; KV cache utilization 0.61; no rejections

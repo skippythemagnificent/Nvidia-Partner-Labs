@@ -1,0 +1,117 @@
+{
+  "faithfulness_gate": 0.85,
+  "runs": [
+    {
+      "run": 1,
+      "date": "2026-05-01",
+      "faithfulness": 0.94,
+      "answer_relevancy": 0.9,
+      "context_precision": 0.88,
+      "n_questions": 120
+    },
+    {
+      "run": 2,
+      "date": "2026-05-02",
+      "faithfulness": 0.93,
+      "answer_relevancy": 0.895,
+      "context_precision": 0.876,
+      "n_questions": 120
+    },
+    {
+      "run": 3,
+      "date": "2026-05-03",
+      "faithfulness": 0.94,
+      "answer_relevancy": 0.89,
+      "context_precision": 0.872,
+      "n_questions": 120
+    },
+    {
+      "run": 4,
+      "date": "2026-05-04",
+      "faithfulness": 0.92,
+      "answer_relevancy": 0.885,
+      "context_precision": 0.868,
+      "n_questions": 120
+    },
+    {
+      "run": 5,
+      "date": "2026-05-05",
+      "faithfulness": 0.91,
+      "answer_relevancy": 0.88,
+      "context_precision": 0.864,
+      "n_questions": 120
+    },
+    {
+      "run": 6,
+      "date": "2026-05-06",
+      "faithfulness": 0.9,
+      "answer_relevancy": 0.875,
+      "context_precision": 0.86,
+      "n_questions": 120
+    },
+    {
+      "run": 7,
+      "date": "2026-05-07",
+      "faithfulness": 0.88,
+      "answer_relevancy": 0.87,
+      "context_precision": 0.856,
+      "n_questions": 120
+    },
+    {
+      "run": 8,
+      "date": "2026-05-08",
+      "faithfulness": 0.87,
+      "answer_relevancy": 0.865,
+      "context_precision": 0.852,
+      "n_questions": 120
+    },
+    {
+      "run": 9,
+      "date": "2026-05-09",
+      "faithfulness": 0.86,
+      "answer_relevancy": 0.86,
+      "context_precision": 0.848,
+      "n_questions": 120
+    },
+    {
+      "run": 10,
+      "date": "2026-05-10",
+      "faithfulness": 0.83,
+      "answer_relevancy": 0.855,
+      "context_precision": 0.844,
+      "n_questions": 120
+    },
+    {
+      "run": 11,
+      "date": "2026-05-11",
+      "faithfulness": 0.82,
+      "answer_relevancy": 0.85,
+      "context_precision": 0.84,
+      "n_questions": 120
+    },
+    {
+      "run": 12,
+      "date": "2026-05-12",
+      "faithfulness": 0.84,
+      "answer_relevancy": 0.845,
+      "context_precision": 0.836,
+      "n_questions": 120
+    },
+    {
+      "run": 13,
+      "date": "2026-05-13",
+      "faithfulness": 0.81,
+      "answer_relevancy": 0.84,
+      "context_precision": 0.832,
+      "n_questions": 120
+    },
+    {
+      "run": 14,
+      "date": "2026-05-14",
+      "faithfulness": 0.8,
+      "answer_relevancy": 0.835,
+      "context_precision": 0.828,
+      "n_questions": 120
+    }
+  ]
+}
