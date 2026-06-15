@@ -25,6 +25,7 @@ dependencies = [
     "opentelemetry-sdk>=1.24",
     "prometheus-client>=0.20",
     "ipykernel>=7.3.0",
+    "mcp>=1.2",
 ]
 
 [project.optional-dependencies]
@@ -45,6 +46,9 @@ dev = [
 # importlib import mode so each lab's identically-named tests/test_lab.py can be
 # collected together (e.g. `task lab:test:all`) without module-name collisions.
 addopts = "--import-mode=importlib"
+markers = [
+    "slow: tests that load local ML models (NeMoClaw RAG tools); deselect with -m 'not slow'",
+]
 
 [tool.ruff]
 # Notebooks are authored teaching artifacts: stub cells intentionally leave
@@ -54,7 +58,7 @@ addopts = "--import-mode=importlib"
 extend-exclude = ["*.ipynb"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["shared"]
+packages = ["shared", "nemoclaw"]
 
 [build-system]
 requires = ["hatchling"]

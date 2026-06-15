@@ -104,14 +104,14 @@ tasks:
   lint:
     desc: Ruff lint + format check
     cmds:
-      - uv run ruff check shared/ labs/
-      - uv run ruff format --check shared/ labs/
+      - uv run ruff check shared/ labs/ nemoclaw/
+      - uv run ruff format --check shared/ labs/ nemoclaw/
 
   lint:fix:
     desc: Auto-fix lint issues
     cmds:
-      - uv run ruff check --fix shared/ labs/
-      - uv run ruff format shared/ labs/
+      - uv run ruff check --fix shared/ labs/ nemoclaw/
+      - uv run ruff format shared/ labs/ nemoclaw/
 
   # ── Decks ──────────────────────────────────────────────────────────────────────
 
@@ -172,6 +172,37 @@ tasks:
     cmds:
       - '{{.UVX}} run pulumi stack select {{.STACK}}'
       - '{{.UVX}} run pulumi refresh --yes'
+
+  # ── NeMoClaw (MCP troubleshooting agent) ──────────────────────────────────────
+
+  nemoclaw:setup:
+    desc: Install the NeMoClaw agent's NeMo Agent Toolkit deps (separate uv project)
+    dir: nemoclaw/agent
+    cmds:
+      - '{{.UVX}} sync'
+
+  nemoclaw:serve:
+    desc: Run the NeMoClaw MCP server standalone (stdio) — for the MCP Inspector or Claude Desktop
+    cmds:
+      - uv run python -m nemoclaw.server
+
+  nemoclaw:run:
+    desc: Ask NeMoClaw to troubleshoot a scenario (task nemoclaw:run SCENARIO="our air-gapped NIM won't start")
+    dir: nemoclaw/agent
+    env:
+      # NAT's bundled OTel protos need the pure-Python protobuf backend to import.
+      PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
+      # The MCP server launches in the ROOT lab project via `uv run --directory ${REPO_ROOT}`.
+      REPO_ROOT: '{{.ROOT_DIR}}'
+    requires:
+      vars: [SCENARIO]
+    cmds:
+      - '{{.UVX}} run nat run --config_file nemoclaw.yml --input "{{.SCENARIO}}"'
+
+  nemoclaw:test:
+    desc: Run the NeMoClaw tool tests (pins each lab's canonical numbers; includes the slow RAG test)
+    cmds:
+      - uv run python -m pytest nemoclaw/tests/ -v
 
   # ── Utilities ─────────────────────────────────────────────────────────────────
 

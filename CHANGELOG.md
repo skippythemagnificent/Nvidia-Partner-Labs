@@ -5,6 +5,35 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added — NeMoClaw: MCP troubleshooting agent
+
+A capstone agent that exposes the labs' verified diagnostic logic as MCP tools and
+drives them with the NVIDIA NeMo Agent Toolkit using an LLM NIM as its reasoning brain.
+
+- **`nemoclaw/diagnostics/`** — importable, single-source-of-truth ports of the verified
+  lab solution logic: `lab03_nim.py` (startup/log diagnosis, profile auto-selection, KV
+  capacity, air-gap artifacts), `lab04_gpu.py` (KV-per-token, max concurrency,
+  fit/`min_tp_to_fit`, decode throughput, capacity planner), `lab06_mlops.py` (Prometheus
+  parse, SLO breach window, alert lead time, RAGAS gate), `lab0102_rag.py` (self-contained
+  RAG retrieve/rerank/hit-rate using the same local models the mock NIM wraps). `lab05`
+  re-exports `shared/agent_sim.py`. `fixtures.py` loads the committed `labs/*/data`.
+- **`nemoclaw/scenarios.py`** — the named real-world scenarios each lab dramatizes,
+  mapped to the tools that diagnose them.
+- **`nemoclaw/server/__main__.py`** — a FastMCP server exposing **21 tools** across all 7
+  labs (`python -m nemoclaw.server`, stdio). Tool docstrings are written for the model.
+- **`nemoclaw/tests/test_tools.py`** — pins every tool to its lab's canonical numbers
+  (TTR 148.043s, KV ceiling 28, 70B `min_tp`=2, breach 1080–1470s, alert lead 120s, RAGAS
+  gate run #10, RAG hit-rate 0.50→0.75). 15 tests, green; the RAG test is marked `slow`.
+- **`nemoclaw/agent/`** — a standalone NeMo Agent Toolkit uv project (isolated heavy deps,
+  like `infra/`): `nemoclaw.yml` wires a `nim` LLM (`meta/llama-3.1-70b-instruct` on the
+  API Catalog) + an `mcp_client` function group (launches the server over stdio in the
+  root venv via `uv run --directory ${REPO_ROOT}`) + a `tool_calling_agent` with an
+  SE-persona system prompt. Verified end to end against `nvidia-nat` 1.7.0.
+- **`Taskfile.yml`** — `nemoclaw:setup` / `nemoclaw:serve` / `nemoclaw:run SCENARIO="..."`
+  / `nemoclaw:test`; `lint` now also covers `nemoclaw/`.
+- **Root `pyproject.toml`** — added `mcp>=1.2`; `nemoclaw` added to the wheel packages;
+  registered a `slow` pytest marker.
+
 ### Added — Lab 06: MLOps & Platform (fully authored)
 
 The observability + continuous-eval capstone. Fully analytical (no GPU, no NIM calls):

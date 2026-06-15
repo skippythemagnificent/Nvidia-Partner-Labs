@@ -1,0 +1,69 @@
+# NeMoClaw — NeMo Agent Toolkit workflow (verified against nvidia-nat 1.7.0).
+#
+# A tool-calling agent whose reasoning brain is an LLM NIM (NVIDIA API Catalog by
+# default) and whose hands are the NeMoClaw MCP server (the lab diagnostic tools).
+# The MCP server runs out-of-process in the ROOT lab venv over stdio; `uv run
+# --directory ${REPO_ROOT}` targets that project no matter where `nat` is launched.
+# NAT interpolates ${VAR:-default} via the `expandvars` library; `task nemoclaw:run`
+# exports REPO_ROOT, and the default keeps a direct `nat run` working from the agent dir.
+#
+# Run:  task nemoclaw:run SCENARIO="Our air-gapped NIM won't start — here's the log"
+
+llms:
+  nemoclaw_nim:
+    _type: nim
+    # API Catalog model (auth via NVIDIA_API_KEY). Override model_name/base_url for
+    # an on-prem LLM NIM, e.g. --override llms.nemoclaw_nim.base_url http://nim-llm:8000/v1
+    model_name: meta/llama-3.1-70b-instruct
+    temperature: 0.0
+    max_tokens: 1024
+
+function_groups:
+  lab_tools:
+    _type: mcp_client
+    server:
+      transport: stdio
+      # `env -u VIRTUAL_ENV` strips the agent venv so the child `uv run` resolves the
+      # ROOT lab project (which has mcp + nemoclaw + shared), not the agent venv.
+      command: env
+      args:
+        - -u
+        - VIRTUAL_ENV
+        - uv
+        - run
+        - --directory
+        - ${REPO_ROOT:-../..}
+        - python
+        - -m
+        - nemoclaw.server
+
+workflow:
+  _type: tool_calling_agent
+  llm_name: nemoclaw_nim
+  verbose: true
+  handle_tool_errors: true
+  max_iterations: 12
+  system_prompt: |
+    You are NeMoClaw, an NVIDIA solutions engineer's troubleshooting copilot for the
+    NVIDIA Partner Lab scenarios: RAG retrieval quality (Labs 01-02), NIM deployment
+    failures (Lab 03), GPU capacity planning (Lab 04), agent orchestration
+    non-determinism (Lab 05), and NIM cluster SLO incidents (Lab 06).
+
+    How you work:
+    1. Map the problem to a scenario. If it is unclear, call list_scenarios (and
+       describe_scenario) to find the matching lab and its tools.
+    2. Gather evidence with tools — never guess a metric. For example: a NIM that won't
+       start -> nim_diagnose_log, then nim_select_profile / nim_check_airgap_cache for
+       profile/air-gap issues; 503s under load -> nim_kv_capacity; GPU sizing ->
+       gpu_capacity_plan and gpu_fits_on_one; flaky routing -> agent_route_distribution
+       then agent_route_ticket mode=robust; an SLO incident -> mlops_summarize_incident
+       then mlops_alert_lead_time and mlops_ragas_gate; wrong RAG answers -> rag_eval
+       and rag_two_stage.
+    3. Answer like an SE on the call: lead with the root cause, then the fix, then the
+       measured number that proves it (time-to-ready, KV ceiling, breach window, alert
+       lead time, hit-rate delta). Be concise and cite the exact values the tools
+       returned. Every number you state must come from a tool call.
+  # Reference the function group itself — NAT expands it to all 21 discovered MCP
+  # tools, so the tool list stays in sync with the server automatically.
+  tool_names:
+    - lab_tools

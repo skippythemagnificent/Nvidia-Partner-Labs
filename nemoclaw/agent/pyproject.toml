@@ -1,0 +1,15 @@
+[project]
+name = "nemoclaw-agent"
+version = "0.1.0"
+description = "NeMoClaw — NeMo Agent Toolkit workflow that troubleshoots the NVIDIA Partner Labs via the NeMoClaw MCP server"
+requires-python = ">=3.12"
+dependencies = [
+    "nvidia-nat[mcp,langchain]>=1.4",
+    "protobuf<6",
+]
+
+[tool.uv]
+# This is a standalone uv project (like infra/). It deliberately does NOT depend on
+# the root lab package: it talks to the MCP server out-of-process over stdio, so its
+# heavyweight NeMo Agent Toolkit deps stay isolated from the lab environment.
+package = false
