@@ -26,5 +26,5 @@ labs/*/data/*.parquet
 labs/*/data/*.sqlite
 chroma_db/
 
-# Generated decks (rebuild with: task deck:build)
-decks/*.pptx
+# Lecture decks — generators + built .pptx kept local (private lecture content)
+decks/

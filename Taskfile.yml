@@ -120,6 +120,15 @@ tasks:
     cmds:
       - uv run python decks/build_deck.py
 
+  deck:build:all:
+    desc: Build every lecture deck (Labs 01–02 RAG + per-lab decks 03–06)
+    cmds:
+      - uv run python decks/build_deck.py
+      - uv run python decks/build_deck_03.py
+      - uv run python decks/build_deck_04.py
+      - uv run python decks/build_deck_05.py
+      - uv run python decks/build_deck_06.py
+
   # ── Infrastructure (Pulumi) ───────────────────────────────────────────────────
 
   infra:init:
