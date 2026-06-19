@@ -26,5 +26,7 @@ labs/*/data/*.parquet
 labs/*/data/*.sqlite
 chroma_db/
 
-# Lecture decks — generators + built .pptx kept local (private lecture content)
-decks/
+# Lecture decks: generators (.py) kept local (private content); built .pptx are committed
+decks/*.py
+# PowerPoint lock files (created when a deck is open in the app)
+~$*.pptx

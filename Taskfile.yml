@@ -116,14 +116,15 @@ tasks:
   # ── Decks ──────────────────────────────────────────────────────────────────────
 
   deck:build:
-    desc: Build the combined RAG lecture deck (Labs 01–02) -> decks/*.pptx
+    desc: Build all lecture decks (one .pptx per lab, 01–06) -> decks/*.pptx
     cmds:
-      - uv run python decks/build_deck.py
+      - task: deck:build:all
 
   deck:build:all:
-    desc: Build every lecture deck (Labs 01–02 RAG + per-lab decks 03–06)
+    desc: Build every lecture deck (one .pptx per lab, 01–06)
     cmds:
-      - uv run python decks/build_deck.py
+      - uv run python decks/build_deck_01.py
+      - uv run python decks/build_deck_02.py
       - uv run python decks/build_deck_03.py
       - uv run python decks/build_deck_04.py
       - uv run python decks/build_deck_05.py
