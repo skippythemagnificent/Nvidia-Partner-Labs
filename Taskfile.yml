@@ -130,6 +130,13 @@ tasks:
       - uv run python decks/build_deck_05.py
       - uv run python decks/build_deck_06.py
 
+  # ── Docs ─────────────────────────────────────────────────────────────────────
+
+  docs:build:
+    desc: Build the plain-English concepts guide -> docs/concepts-plain-english.docx
+    cmds:
+      - uv run python docs/build_plain_english.py
+
   # ── Infrastructure (Pulumi) ───────────────────────────────────────────────────
 
   infra:init:
