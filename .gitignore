@@ -28,5 +28,8 @@ chroma_db/
 
 # Lecture decks: generators (.py) kept local (private content); built .pptx are committed
 decks/*.py
-# PowerPoint lock files (created when a deck is open in the app)
+# Doc generators kept local (private); built .md / .docx are committed
+docs/*.py
+# Office lock files (created when a deck/doc is open in the app)
 ~$*.pptx
+~$*.docx
