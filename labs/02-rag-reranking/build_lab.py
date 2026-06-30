@@ -74,7 +74,7 @@ CORPUS = json.loads((DATA / "corpus.json").read_text())
 EVAL = json.loads((DATA / "eval.json").read_text())
 
 EMBED_MODEL = "nvidia/nv-embedqa-e5-v5"
-RERANK_MODEL = "nvidia/nv-rerankqa-mistral-4b-v3"
+RERANK_MODEL = "nvidia/rerank-qa-mistral-4b"
 
 SENTENCE_MAX_CHARS = 320     # sentence-aware chunking budget (from Lab 01)
 OVER_RETRIEVE_K1 = 20        # stage 1: cheap candidates from the bi-encoder
