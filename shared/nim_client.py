@@ -17,9 +17,23 @@ load_dotenv()
 
 _DEFAULT_BASE = "https://integrate.api.nvidia.com/v1"
 
+# Hosted reranking on the NVIDIA API Catalog is NOT OpenAI-compatible: it lives on a
+# different host than embeddings/LLM (`ai.api.nvidia.com`) at a model-scoped retrieval
+# path. A self-hosted NIM container (and the local mock) instead expose `<base>/ranking`.
+_CATALOG_HOSTS = ("integrate.api.nvidia.com", "ai.api.nvidia.com")
+_CATALOG_RERANK_URL = "https://ai.api.nvidia.com/v1/retrieval/nvidia/reranking"
+
 
 def _base_url(env_key: str) -> str:
     return os.environ.get(env_key, _DEFAULT_BASE)
+
+
+def _rerank_endpoint() -> str:
+    """Reranking URL for the configured backend (hosted Catalog vs NIM/mock)."""
+    base = _base_url("NIM_RERANK_URL")
+    if httpx.URL(base).host in _CATALOG_HOSTS:
+        return _CATALOG_RERANK_URL
+    return base.rstrip("/") + "/ranking"
 
 
 def _api_key() -> str:
@@ -39,19 +53,19 @@ def get_rerank_client() -> OpenAI:
 def rerank(
     query: str,
     passages: list[str],
-    model: str = "nvidia/nv-rerankqa-mistral-4b-v3",
+    model: str = "nvidia/rerank-qa-mistral-4b",
     top_n: int | None = None,
     timeout: float = 30.0,
 ) -> list[dict]:
     """Score `passages` against `query` with the reranking NIM.
 
-    Reranking is not part of the OpenAI schema, so it is a plain POST to the NIM's
-    ``/ranking`` endpoint rather than a method on the OpenAI client. Returns the
-    ``rankings`` list — dicts of ``{"index": <position in passages>, "logit":
-    <relevance score>}`` sorted from most to least relevant. Higher logit = more
-    relevant; the index maps each ranking back to the input `passages`.
+    Reranking is not part of the OpenAI schema, so it is a plain POST (see
+    ``_rerank_endpoint`` for the backend-specific URL) rather than a method on the
+    OpenAI client. Returns the ``rankings`` list — dicts of ``{"index": <position in
+    passages>, "logit": <relevance score>}`` sorted from most to least relevant.
+    Higher logit = more relevant; the index maps each ranking back to the input
+    `passages`.
     """
-    url = _base_url("NIM_RERANK_URL").rstrip("/") + "/ranking"
     payload: dict = {
         "model": model,
         "query": {"text": query},
@@ -60,13 +74,18 @@ def rerank(
     if top_n is not None:
         payload["top_n"] = top_n
     r = httpx.post(
-        url,
+        _rerank_endpoint(),
         json=payload,
         headers={"Authorization": f"Bearer {_api_key()}"},
         timeout=timeout,
     )
     r.raise_for_status()
-    return r.json()["rankings"]
+    rankings = r.json()["rankings"]
+    # The hosted Catalog accepts but ignores top_n; enforce it client-side so every
+    # backend (Catalog, self-hosted NIM, mock) returns the same number of rankings.
+    if top_n is not None:
+        rankings = rankings[:top_n]
+    return rankings
 
 
 def get_llm_client() -> OpenAI:

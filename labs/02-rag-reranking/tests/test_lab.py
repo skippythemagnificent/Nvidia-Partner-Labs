@@ -19,7 +19,7 @@ SENTENCE_MAX_CHARS = 320
 OVER_RETRIEVE_K1 = 20
 RERANK_K2 = 5
 EMBED_MODEL = "nvidia/nv-embedqa-e5-v5"
-RERANK_MODEL = "nvidia/nv-rerankqa-mistral-4b-v3"
+RERANK_MODEL = "nvidia/rerank-qa-mistral-4b"
 
 
 # ── reference pipeline (mirrors the notebook) ────────────────────────────────
