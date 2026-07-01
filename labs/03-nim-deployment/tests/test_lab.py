@@ -2,8 +2,7 @@
 
 Lab 03 is an offline log-analysis lab, so these tests reimplement the reference
 parsing/selection/diagnosis logic (mirroring the notebook) and assert the canonical
-numbers, plus data invariants and end-to-end execution of the solution notebook.
-The learner `lab.ipynb` is not executed here — its stubs fail by design.
+numbers, plus data invariants and end-to-end execution of the lab notebook.
 """
 from __future__ import annotations
 
@@ -176,27 +175,19 @@ def test_missing_artifacts_for_target_profile(profiles, cache_manifest, deployme
     }
 
 
-# ── build integrity + solution execution ─────────────────────────────────────
-
-
-def test_learner_has_stubs_solution_does_not(solution_nb):
-    lab = solution_nb.parent.parent.parent / "labs/03-nim-deployment/lab.ipynb"
-    lab_src = " ".join("".join(c["source"]) for c in json.loads(lab.read_text())["cells"])
-    sol_src = " ".join("".join(c["source"]) for c in json.loads(solution_nb.read_text())["cells"])
-    assert "TODO" in lab_src and "replace this line" in lab_src, "learner copy lost its stubs"
-    assert "TODO" not in sol_src and "replace this line" not in sol_src, "solution has stubs"
+# ── notebook execution ─────────────────────────────────────
 
 
 @pytest.mark.slow
-def test_solution_notebook_executes(solution_nb):
+def test_lab_notebook_executes(lab_nb):
     nbformat = pytest.importorskip("nbformat")
     nbclient = pytest.importorskip("nbclient")
 
-    nb = nbformat.read(str(solution_nb), as_version=4)
+    nb = nbformat.read(str(lab_nb), as_version=4)
     client = nbclient.NotebookClient(
         nb,
         timeout=300,
         kernel_name="python3",
-        resources={"metadata": {"path": str(solution_nb.parent)}},
+        resources={"metadata": {"path": str(lab_nb.parent)}},
     )
     client.execute()

@@ -5,6 +5,22 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Changed — Labs now hold complete walkthrough notebooks (dropped `solutions/`)
+
+Restructured so each `labs/NN/lab.ipynb` **is** the complete, runnable code, meant to be
+read and walked through in instructional labs/videos rather than filled in.
+
+- Promoted the completed notebooks into `labs/` and removed the parallel `solutions/`
+  tree and all six `labs/NN/build_lab.py` generators (notebooks are now the source of
+  truth, edited directly).
+- Dropped the learner-stub concept entirely: no more TODO/`replace this line` cells.
+- Fixed reranking against the NVIDIA API Catalog in `shared/nim_client.py`
+  (`ai.api.nvidia.com/v1/retrieval/nvidia/reranking`; client-side `top_n`) and updated the
+  renamed model id `nv-rerankqa-mistral-4b-v3` → `rerank-qa-mistral-4b`.
+- Tests: removed `test_learner_has_stubs_solution_does_not`; the notebook-execution test
+  and its fixture now target `labs/NN/lab.ipynb` (`lab_nb` / `LAB_NB`).
+- Added `%autoreload` to every lab notebook so edits to `shared/` hot-reload.
+
 ### Added — NeMoClaw: MCP troubleshooting agent
 
 A capstone agent that exposes the labs' verified diagnostic logic as MCP tools and

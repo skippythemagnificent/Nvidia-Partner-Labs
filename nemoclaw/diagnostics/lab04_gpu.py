@@ -1,7 +1,7 @@
 """Lab 04 — GPU architecture for inference (analytical capacity modeling).
 
 Faithful port of the verified solution logic in
-``labs/04-gpu-architecture/build_lab.py``. Pinned by the test suite against the
+``labs/04-gpu-architecture/lab.ipynb``. Pinned by the test suite against the
 labs' canonical numbers (8B KV=131072 B/tok, 70B fp16 min_tp=2, chat/8B/H100 -> 1 GPU
 bound by KV cache, etc.).
 """

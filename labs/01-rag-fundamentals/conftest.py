@@ -28,7 +28,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 DATA = REPO_ROOT / "labs/01-rag-fundamentals/data"
-SOLUTION_NB = REPO_ROOT / "solutions/01-rag-fundamentals/lab.ipynb"
+LAB_NB = REPO_ROOT / "labs/01-rag-fundamentals/lab.ipynb"
 MOCK_PORT = 8099
 MOCK_URL = f"http://localhost:{MOCK_PORT}/v1"
 
@@ -38,8 +38,8 @@ def pytest_configure(config):
 
 
 @pytest.fixture(scope="session")
-def solution_nb() -> Path:
-    return SOLUTION_NB
+def lab_nb() -> Path:
+    return LAB_NB
 
 
 @pytest.fixture(scope="session")

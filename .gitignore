@@ -14,9 +14,6 @@ __pycache__/
 claude.md
 CLAUDE.md
 
-# Solutions are instructor-only on learner branch
-# solutions/
-
 # Pulumi
 Pulumi.*.yaml.bak
 .pulumi/

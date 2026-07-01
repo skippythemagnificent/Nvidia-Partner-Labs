@@ -3,8 +3,7 @@
 Reimplements the reference observability math (mirroring the notebook) and asserts the
 incident's canonical numbers — parse, rates, percentiles, the SLO-breach window, the
 alert lead time, and the RAGAS gate — plus data invariants and end-to-end execution of
-the solution notebook. The learner `lab.ipynb` is not executed here; its stubs fail by
-design.
+the lab notebook.
 """
 from __future__ import annotations
 
@@ -144,27 +143,19 @@ def test_regression_gate(eval_runs):
         assert r["faithfulness"] >= eval_runs["faithfulness_gate"]
 
 
-# ── build integrity + solution execution ─────────────────────────────────────
-
-
-def test_learner_has_stubs_solution_does_not(solution_nb):
-    lab = solution_nb.parent.parent.parent / "labs/06-mlops-platform/lab.ipynb"
-    lab_src = " ".join("".join(c["source"]) for c in json.loads(lab.read_text())["cells"])
-    sol_src = " ".join("".join(c["source"]) for c in json.loads(solution_nb.read_text())["cells"])
-    assert "TODO" in lab_src and "NotImplementedError" in lab_src, "learner copy lost its stubs"
-    assert "TODO" not in sol_src, "solution still contains TODO markers"
+# ── notebook execution ─────────────────────────────────────
 
 
 @pytest.mark.slow
-def test_solution_notebook_executes(solution_nb):
+def test_lab_notebook_executes(lab_nb):
     nbformat = pytest.importorskip("nbformat")
     nbclient = pytest.importorskip("nbclient")
 
-    nb = nbformat.read(str(solution_nb), as_version=4)
+    nb = nbformat.read(str(lab_nb), as_version=4)
     client = nbclient.NotebookClient(
         nb,
         timeout=300,
         kernel_name="python3",
-        resources={"metadata": {"path": str(solution_nb.parent)}},
+        resources={"metadata": {"path": str(lab_nb.parent)}},
     )
     client.execute()
