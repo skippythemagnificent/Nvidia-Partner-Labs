@@ -97,10 +97,9 @@ nvidia-partner-labs/
 ├── shared/                # importable helpers used by every lab
 ├── labs/00-setup ... 06-mlops-platform/
 │   ├── README.md          # scenario / what-why-how
-│   ├── lab.ipynb          # the lab notebook
+│   ├── lab.ipynb          # the lab notebook — complete, runnable walkthrough code
 │   ├── data/              # corpora + generate.py
 │   └── tests/             # pytest + nbmake validation
-├── solutions/             # instructor copies (gitignored on learner branch)
 └── infra/                 # separate uv + Pulumi project
     ├── components/        # NimCluster, MonitoringStack, VectorStore, Networking
     └── Pulumi.{dev,staging,prod}.yaml

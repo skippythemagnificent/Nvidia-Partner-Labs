@@ -1,7 +1,7 @@
 """Lab 06 — MLOps & platform observability (offline metric analysis).
 
 Faithful port of the verified solution logic in
-``labs/06-mlops-platform/build_lab.py``. Pinned by the test suite against the labs'
+``labs/06-mlops-platform/lab.ipynb``. Pinned by the test suite against the labs'
 canonical numbers (TTFT p99 breach window 1080-1470s, alert lead time 120s, RAGAS
 regression gate trips run #10).
 """

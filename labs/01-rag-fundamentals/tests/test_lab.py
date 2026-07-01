@@ -3,11 +3,7 @@
 Two kinds of checks:
   - data invariants the notebook and its narrative depend on (corpus shape,
     answer spans, the fixed-vs-sentence chunking claim, cosine-space scores);
-  - that the *solution* notebook executes top to bottom against the mock NIM.
-
-The learner `lab.ipynb` is intentionally NOT executed here — its TODO stubs fail
-loudly until completed, which is the point. `task lab:test` runs nbmake on it so a
-learner can check their own filled-in copy.
+  - that the lab notebook executes top to bottom against the mock NIM.
 """
 
 from __future__ import annotations
@@ -160,16 +156,16 @@ def test_sentence_chunking_beats_fixed(mock_nim, corpus, eval_set, tmp_path):
 
 
 @pytest.mark.slow
-def test_solution_notebook_executes(mock_nim, solution_nb):
-    """Execute the completed solution end to end; no cell may raise."""
+def test_lab_notebook_executes(mock_nim, lab_nb):
+    """Execute the lab notebook end to end; no cell may raise."""
     nbformat = pytest.importorskip("nbformat")
     nbclient = pytest.importorskip("nbclient")
 
-    nb = nbformat.read(str(solution_nb), as_version=4)
+    nb = nbformat.read(str(lab_nb), as_version=4)
     client = nbclient.NotebookClient(
         nb,
         timeout=300,
         kernel_name="python3",
-        resources={"metadata": {"path": str(solution_nb.parent)}},
+        resources={"metadata": {"path": str(lab_nb.parent)}},
     )
     client.execute()  # raises CellExecutionError on any unhandled exception

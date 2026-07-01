@@ -2,7 +2,7 @@
 
 Lab 03 is fully offline — no GPU, no NIM, no NVIDIA_API_KEY — so unlike Labs 01–02
 there is no mock-NIM server to stand up. These fixtures just load the generated
-deployment artifacts (log samples + profile manifest) and expose the solution
+deployment artifacts (log samples + profile manifest) and expose the lab notebook
 notebook path for the execution test.
 """
 from __future__ import annotations
@@ -22,7 +22,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 DATA = REPO_ROOT / "labs/03-nim-deployment/data"
-SOLUTION_NB = REPO_ROOT / "solutions/03-nim-deployment/lab.ipynb"
+LAB_NB = REPO_ROOT / "labs/03-nim-deployment/lab.ipynb"
 
 
 def pytest_configure(config):
@@ -30,8 +30,8 @@ def pytest_configure(config):
 
 
 @pytest.fixture(scope="session")
-def solution_nb() -> Path:
-    return SOLUTION_NB
+def lab_nb() -> Path:
+    return LAB_NB
 
 
 @pytest.fixture(scope="session")

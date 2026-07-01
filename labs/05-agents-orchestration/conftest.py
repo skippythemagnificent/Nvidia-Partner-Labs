@@ -2,7 +2,7 @@
 
 Lab 05 runs fully offline against the seeded simulation in `shared/agent_sim.py` —
 no GPU, no NIM, no NVIDIA_API_KEY — so (like Labs 03–04) there is no mock-NIM server.
-These fixtures load the ticket / backend / adversarial data and expose the solution
+These fixtures load the ticket / backend / adversarial data and expose the lab notebook
 notebook path for the execution test.
 """
 from __future__ import annotations
@@ -22,7 +22,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 DATA = REPO_ROOT / "labs/05-agents-orchestration/data"
-SOLUTION_NB = REPO_ROOT / "solutions/05-agents-orchestration/lab.ipynb"
+LAB_NB = REPO_ROOT / "labs/05-agents-orchestration/lab.ipynb"
 
 
 def pytest_configure(config):
@@ -30,8 +30,8 @@ def pytest_configure(config):
 
 
 @pytest.fixture(scope="session")
-def solution_nb() -> Path:
-    return SOLUTION_NB
+def lab_nb() -> Path:
+    return LAB_NB
 
 
 @pytest.fixture(scope="session")

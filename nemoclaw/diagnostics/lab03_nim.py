@@ -1,7 +1,7 @@
 """Lab 03 — NIM deployment & troubleshooting (offline log/artifact diagnosis).
 
 Faithful port of the verified solution logic in
-``labs/03-nim-deployment/build_lab.py``. Pinned by ``nemoclaw/tests/test_tools.py``
+``labs/03-nim-deployment/lab.ipynb``. Pinned by ``nemoclaw/tests/test_tools.py``
 against the labs' canonical numbers (e.g. time-to-ready 148.043s, KV ceiling 28,
 H100->fp8 / A100->fp16 profile split, air-gap missing artifacts).
 """

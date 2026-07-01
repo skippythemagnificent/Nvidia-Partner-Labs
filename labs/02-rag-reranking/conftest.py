@@ -2,7 +2,7 @@
 
 Mirrors Lab 01: corpus/eval data plus a session-scoped mock NIM so the bi-encoder
 and reranker run with no GPU and no NVIDIA_API_KEY. Also pins NVIDIA_API_KEY empty
-so the notebook's optional generation cell skips and the solution-execution test
+so the notebook's optional generation cell skips and the notebook-execution test
 stays offline and deterministic.
 """
 from __future__ import annotations
@@ -26,7 +26,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 DATA = REPO_ROOT / "labs/02-rag-reranking/data"
-SOLUTION_NB = REPO_ROOT / "solutions/02-rag-reranking/lab.ipynb"
+LAB_NB = REPO_ROOT / "labs/02-rag-reranking/lab.ipynb"
 MOCK_PORT = 8099
 MOCK_URL = f"http://localhost:{MOCK_PORT}/v1"
 
@@ -36,8 +36,8 @@ def pytest_configure(config):
 
 
 @pytest.fixture(scope="session")
-def solution_nb() -> Path:
-    return SOLUTION_NB
+def lab_nb() -> Path:
+    return LAB_NB
 
 
 @pytest.fixture(scope="session")

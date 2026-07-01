@@ -2,7 +2,7 @@
 
 Lab 06 is fully analytical — no GPU, no NIM, no NVIDIA_API_KEY — so (like Labs 03–05)
 there is no mock-NIM server. These fixtures load the raw scrape, the time series, and
-the RAGAS runs, and expose the solution notebook path for the execution test.
+the RAGAS runs, and expose the lab notebook path for the execution test.
 """
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 DATA = REPO_ROOT / "labs/06-mlops-platform/data"
-SOLUTION_NB = REPO_ROOT / "solutions/06-mlops-platform/lab.ipynb"
+LAB_NB = REPO_ROOT / "labs/06-mlops-platform/lab.ipynb"
 
 
 def pytest_configure(config):
@@ -29,8 +29,8 @@ def pytest_configure(config):
 
 
 @pytest.fixture(scope="session")
-def solution_nb() -> Path:
-    return SOLUTION_NB
+def lab_nb() -> Path:
+    return LAB_NB
 
 
 @pytest.fixture(scope="session")
